@@ -114,7 +114,7 @@ else:
 ## Specify resources and API keys
 
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
-targetPortscan = [20, 22, 23, 25, 53, 80, 8000, 8080, 8081, 8088, 6667, 6668, 123, 156, 443, 10000]: # What ports to scan
+targetPortscan = [20, 22, 23, 25, 53, 80, 8000, 8080, 8081, 8088, 6667, 6668, 123, 156, 443, 10000] # What ports to scan
 sourceListZIP = ['http://www.malware-domains.com/files/domains.zip'] # ZIP files require unpacking before being processed so list them here.
 sourceListText = ['http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist',
 'https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist', 'https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset']
