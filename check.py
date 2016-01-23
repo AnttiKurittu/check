@@ -25,26 +25,11 @@
 #
 ###### check.py ################################################################
 
-import os
-import sys
-import datetime
-import socket
-import urllib2
-import json
-import urllib
-import argparse
-import webbrowser
-import subprocess
-import zipfile
-import dns.resolver
-import requests
-import GeoIP
+import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP
 from StringIO import StringIO
 from passivetotal import PassiveTotal
 from IPy import IP
 
-now = datetime.datetime.now()
-datenow = str(now.strftime("%Y-%m-%d-%H:%M"))
 parser = argparse.ArgumentParser(description='Get actions')
 parser.add_argument("-a", "--all", help="Run all queries", action="store_true")
 parser.add_argument("-an", "--allnotnoisy", help="Run all queries that do not interact with the host directly", action="store_true")
@@ -117,10 +102,10 @@ else:
 
 ## Specify resources and API keys
 
+currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
 targetPortscan = [20, 22, 23, 25, 53, 80, 8000, 8080, 8081, 8088, 6667, 6668, 123, 156, 443, 10000] # What ports to scan
-sourceListZIP = ['http://www.malware-domains.com/files/domains.zip'] # ZIP files require unpacking before being processed so list them here.
-sourceListText = ['http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist',
+sourceListURL = ['http://www.malware-domains.com/files/domains.zip', 'http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist',
 'https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist', 'https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset']
 sourceListSpamDNS = ["zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org", "virbl.dnsbl.bit.nl", "dnsbl.inps.de",
 "ix.dnsbl.manitu.net", "dnsbl.sorbs.net", "bl.spamcannibal.org", "bl.spamcop.net", "xbl.spamhaus.org", "pbl.spamhaus.org",
@@ -180,9 +165,9 @@ if not commandlineArgument.nolog:
     logfile = commandlineArgument.logfile
   else:
     if commandlineArgument.domain:
-        logfile = "check-" + targetHostname + "-"+ datenow + ".log"
+        logfile = "check-" + targetHostname + "-"+ currentDateTime + ".log"
     else:
-        logfile = "check-" + targetIPaddress + "-"+ datenow + ".log"
+        logfile = "check-" + targetIPaddress + "-"+ currentDateTime + ".log"
   class Logger(object):
     def __init__(self, filename = logfile):
         self.terminal = sys.stdout
@@ -199,7 +184,7 @@ else:
 
 if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgument.allnotnoisy or commandlineArgument.listsonly:
   print bcolors.HEADER + gfx.STAR + "Checking malware blocklists for domain name and IP address." + bcolors.ENDC
-  for sourceurl in sourceListText:
+  for sourceurl in sourceListURL:
       listfile = ""
       linecount = 0
       domainmatch = False
@@ -207,8 +192,15 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
       partial = targetHostname.split(".")
       print gfx.PLUS + "Downloading from %s..." % (sourceurl) + bcolors.ENDC
       try:
-          listfile = urllib2.urlopen(sourceurl)
-          listfile = listfile.read()
+          if sourceurl[-4:] == ".zip":
+              filehandle, _ = urllib.urlretrieve(sourceurl)
+              zip_file_object = zipfile.ZipFile(filehandle, 'r')
+              first_file = zip_file_object.namelist()[0]
+              file = zip_file_object.open(first_file)
+              listfile = file.read()
+          else:
+              file = urllib2.urlopen(sourceurl)
+              listfile = file.read()
           for line in listfile.splitlines():
               linecount += 1
           print gfx.PLUS + "Received %s lines." % (linecount) + bcolors.ENDC
@@ -232,40 +224,6 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
           print "Failed: ", str(sys.exc_info()[1])
       print gfx.PIPE
 
-  for sourceurl in sourceListZIP:
-      listfile = ""
-      linecount = 0
-      domainmatch = False
-      ipmatch = False
-      partial = targetHostname.split(".")
-      print gfx.PLUS + "Downloading from %s..." % (sourceurl) + bcolors.ENDC
-      try:
-          filehandle, _ = urllib.urlretrieve(sourceurl)
-          zip_file_object = zipfile.ZipFile(filehandle, 'r')
-          first_file = zip_file_object.namelist()[0]
-          file = zip_file_object.open(first_file)
-          listfile = file.read()
-          for line in listfile.splitlines():
-              linecount += 1
-          print gfx.PLUS + "Received %s lines." % (linecount) + bcolors.ENDC
-          print gfx.PIPE
-          for line in listfile.splitlines():
-            if targetHostname in line:
-              domainmatch = True
-              print gfx.PIPE + bcolors.WARNING + "Matching domain: " + line + bcolors.ENDC
-            if targetIPaddress in line:
-              ipmatch = True
-              print gfx.PIPE + bcolors.WARNING + "Matching IP: " + line + bcolors.ENDC
-            if targetIPrange in line:
-              ipmatch = True
-              print gfx.PIPE + bcolors.WARNING + "IP in range: " + line + bcolors.ENDC
-          if domainmatch == False:
-            print gfx.PIPE + bcolors.OKGREEN + "Domain name is not listed." + bcolors.ENDC
-          if ipmatch == False:
-            print gfx.PIPE + bcolors.OKGREEN + "IP address is not listed." + bcolors.ENDC
-      except Exception:
-          print "Failed: ", str(sys.exc_info()[1])
-      print gfx.PIPE
 else:
   print bcolors.WARNING + gfx.MINUS + "Skipping malwarelists query, Enable with \"--malwarelist\" or \"-ml\"" + bcolors.ENDC
 
