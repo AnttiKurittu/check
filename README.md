@@ -1,4 +1,4 @@
-# check
+# check.py
 
 <p>This is a simple script to pull information about an IP address or domain.</p>
 
