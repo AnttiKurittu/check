@@ -62,8 +62,9 @@ parser.add_argument("-pt", "--passivetotal", help="Query passive DNS records fro
 parser.add_argument("-vt", "--virustotal", help="Query passive DNS records from VirusTotal", action="store_true")
 parser.add_argument("-o", "--open", help="Open GeoIP location in Google Maps", action="store_true")
 parser.add_argument("-L", "--logfile", type=str, help="Specify log file, default is check-[IP]-[DATETIME].log")
-parser.add_argument("-N", "--nolog", help="Do not write log", action="store_true")
+parser.add_argument("-NL", "--nolog", help="Do not write log", action="store_true")
 parser.add_argument("-M", "--monochrome", help="Do not use colored output or graphics", action="store_true")
+parser.add_argument("-NG", "--nogfx", help="Do not use line graphics", action="store_true")
 parser.add_argument("-S", "--nosplash", help="Suppress cool ASCII graphics", action="store_true")
 commandlineArgument = parser.parse_args()
 
@@ -88,12 +89,6 @@ if commandlineArgument.monochrome:
       ENDC = ''
       BOLD = ''
       UNDERLINE = ''
-  class gfx:
-      STAR = ''
-      PLUS = ''
-      PIPE = ''
-      FAIL = ''
-      MINUS = ''
 else:
   class bcolors:
       HEADER = '\033[95m'
@@ -104,6 +99,15 @@ else:
       ENDC = '\033[0m'
       BOLD = '\033[1m'
       UNDERLINE = '\033[4m'
+
+if commandlineArgument.nogfx:
+  class gfx:
+      STAR = ''
+      PLUS = ''
+      PIPE = ''
+      FAIL = ''
+      MINUS = ''
+else:
   class gfx:
       STAR = "[*] "
       PLUS = "[+] "

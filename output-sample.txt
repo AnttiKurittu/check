@@ -1,0 +1,283 @@
+[*] Checking malware blocklists for domain name and IP address.
+[+] Downloading from http://www.malwaredomainlist.com/mdlcsv.php...
+[+] Received 3316 lines.
+ |  
+ |  Domain name is not listed.
+ |  IP address is not listed.
+ |  
+[+] Downloading from https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist...
+[+] Received 443 lines.
+ |  
+ |  Domain name is not listed.
+ |  IP address is not listed.
+ |  
+[+] Downloading from https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist...
+[+] Received 176 lines.
+ |  
+ |  Domain name is not listed.
+ |  IP address is not listed.
+ |  
+[+] Downloading from https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset...
+[+] Received 6611 lines.
+ |  
+ |  Domain name is not listed.
+ |  IP address is not listed.
+ |  
+[+] Downloading from http://www.malware-domains.com/files/domains.zip...
+[+] Received 20056 lines.
+ |  
+ |  Domain name is not listed.
+ |  IP address is not listed.
+ |  
+[*] Querying spamlists for 188.166.129.94...
+ |  
+ |  IP: 188.166.129.94 is NOT listed in zen.spamhaus.org
+ |  IP: 188.166.129.94 is NOT listed in spam.abuse.ch
+ |  IP: 188.166.129.94 is NOT listed in cbl.abuseat.org
+ |  IP: 188.166.129.94 is NOT listed in virbl.dnsbl.bit.nl
+ |  IP: 188.166.129.94 is NOT listed in dnsbl.inps.de
+ |  IP: 188.166.129.94 is NOT listed in ix.dnsbl.manitu.net
+ |  IP: 188.166.129.94 is NOT listed in dnsbl.sorbs.net
+ |  IP: 188.166.129.94 is NOT listed in bl.spamcannibal.org
+ |  IP: 188.166.129.94 is NOT listed in bl.spamcop.net
+ |  IP: 188.166.129.94 is NOT listed in xbl.spamhaus.org
+ |  IP: 188.166.129.94 is NOT listed in pbl.spamhaus.org
+ |  IP: 188.166.129.94 is NOT listed in dnsbl-1.uceprotect.net
+ |  IP: 188.166.129.94 is NOT listed in dnsbl-2.uceprotect.net
+ |  IP: 188.166.129.94 is NOT listed in dnsbl-3.uceprotect.net
+ |  IP: 188.166.129.94 is NOT listed in db.wpbl.info
+ |  
+[*] Fully Qualified Doman Name: 188.166.129.94
+[+] Pinging target, skip with CTRL-C...
+ |  
+ |  188.166.129.94 is responding to ping.
+ |  
+[*] Querying IP Address 188.166.129.94
+ |  
+ |  
+ |  
+ |  
+ |  
+ |  NetRange:       188.0.0.0 - 188.255.255.255
+ |  CIDR:           188.0.0.0/8
+ |  NetName:        188-RIPE
+ |  NetHandle:      NET-188-0-0-0-1
+ |  Parent:          ()
+ |  NetType:        Allocated to RIPE NCC
+ |  OriginAS:
+ |  Organization:   RIPE Network Coordination Centre (RIPE)
+ |  RegDate:
+ |  Updated:        2004-03-16
+ |  Comment:        These addresses have been further assigned to users in
+ |  Comment:        the RIPE NCC region. Contact information can be found in
+ |  Comment:        the RIPE database at http://www.ripe.net/whois
+ |  Ref:            http://whois.arin.net/rest/net/NET-188-0-0-0-1
+ |  
+ |  ResourceLink:  https://apps.db.ripe.net/search/query.html
+ |  ResourceLink:  whois.ripe.net
+ |  
+ |  OrgName:        RIPE Network Coordination Centre
+ |  OrgId:          RIPE
+ |  Address:        P.O. Box 10096
+ |  City:           Amsterdam
+ |  StateProv:
+ |  PostalCode:     1001EB
+ |  Country:        NL
+ |  RegDate:
+ |  Updated:        2013-07-29
+ |  Ref:            http://whois.arin.net/rest/org/RIPE
+ |  
+ |  ReferralServer:  whois://whois.ripe.net
+ |  ResourceLink:  https://apps.db.ripe.net/search/query.html
+ |  
+ |  OrgAbuseHandle: ABUSE3850-ARIN
+ |  OrgAbuseName:   Abuse Contact
+ |  OrgAbusePhone:  +31205354444
+ |  OrgAbuseEmail:  abuse@ripe.net
+ |  OrgAbuseRef:    http://whois.arin.net/rest/poc/ABUSE3850-ARIN
+ |  
+ |  OrgTechHandle: RNO29-ARIN
+ |  OrgTechName:   RIPE NCC Operations
+ |  OrgTechPhone:  +31 20 535 4444
+ |  OrgTechEmail:  hostmaster@ripe.net
+ |  OrgTechRef:    http://whois.arin.net/rest/poc/RNO29-ARIN
+ |  
+ |  
+ |  
+ |  % This is the RIPE Database query service.
+ |  % The objects are in RPSL format.
+ |  %
+ |  % The RIPE Database is subject to Terms and Conditions.
+ |  % See http://www.ripe.net/db/support/db-terms-conditions.pdf
+ |  
+ |  % Note: this output has been filtered.
+ |  %       To receive output for a database update, use the "-B" flag.
+ |  
+ |  % Information related to '188.166.0.0 - 188.166.255.255'
+ |  
+ |  % Abuse contact for '188.166.0.0 - 188.166.255.255' is 'abuse@digitalocean.com'
+ |  
+ |  inetnum:        188.166.0.0 - 188.166.255.255
+ |  netname:        EU-DIGITALOCEAN-20090605
+ |  descr:          Digital Ocean, Inc.
+ |  country:        NL
+ |  org:            ORG-DOI2-RIPE
+ |  admin-c:        PT7353-RIPE
+ |  tech-c:         PT7353-RIPE
+ |  status:         ALLOCATED PA
+ |  mnt-by:         RIPE-NCC-HM-MNT
+ |  mnt-lower:      digitalocean
+ |  mnt-routes:     digitalocean
+ |  mnt-domains:    digitalocean
+ |  created:        2014-11-17T16:36:42Z
+ |  last-modified:  2015-11-19T16:14:23Z
+ |  
+ |  organisation:   ORG-DOI2-RIPE
+ |  org-name:       Digital Ocean, Inc.
+ |  org-type:       LIR
+ |  address:        101 Ave of the Americas
+ |                  10th Floor
+ |  address:        New York
+ |  address:        10013
+ |  address:        UNITED STATES
+ |  phone:          +1 888 890 6714
+ |  mnt-ref:        digitalocean
+ |  mnt-ref:        RIPE-NCC-HM-MNT
+ |  mnt-by:         RIPE-NCC-HM-MNT
+ |  abuse-mailbox:  abuse@digitalocean.com
+ |  abuse-c:        AD10778-RIPE
+ |  created:        2012-11-29T14:59:01Z
+ |  last-modified:  2015-11-19T16:11:55Z
+ |  
+ |  person:         Network Operations
+ |  address:        101 Ave of the Americas, 10th Floor, New York, NY 10013
+ |  phone:          +13478756044
+ |  nic-hdl:        PT7353-RIPE
+ |  mnt-by:         digitalocean
+ |  created:        2015-03-11T16:37:07Z
+ |  last-modified:  2015-11-19T15:57:21Z
+ |  org:            ORG-DOI2-RIPE
+ |  
+ |  % This query was served by the RIPE Database Query Service version 1.84.1 (DB-2)
+ |  
+ |  
+[+] Resolved address 188.166.129.94 for domain kurittu.org
+ |  Domain Name: KURITTU.ORG
+ |  Domain ID: D179273275-LROR
+ |  WHOIS Server:
+ |  Referral URL: http://www.gandi.net
+ |  Updated Date: 2016-01-20T13:20:08Z
+ |  Creation Date: 2016-01-20T13:20:07Z
+ |  Registry Expiry Date: 2021-01-20T13:20:07Z
+ |  Sponsoring Registrar: Gandi SAS
+ |  Sponsoring Registrar IANA ID: 81
+ |  Registrant ID: AK4345-GANDI
+ |  Registrant Name: Antti Kurittu
+ |  Registrant Organization:
+ |  Registrant Street: Obfuscated whois Gandi-63-65 boulevard Massena
+ |  Registrant City: Obfuscated whois Gandi-Paris
+ |  Registrant State/Province:
+ |  Registrant Postal Code: 75013
+ |  Registrant Country: FR
+ |  Registrant Phone: +33.170377666
+ |  Registrant Phone Ext:
+ |  Registrant Fax: +33.143730576
+ |  Registrant Fax Ext:
+ |  Registrant Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
+ |  Admin ID: AK4345-GANDI
+ |  Admin Name: Antti Kurittu
+ |  Admin Organization:
+ |  Admin Street: Obfuscated whois Gandi-63-65 boulevard Massena
+ |  Admin City: Obfuscated whois Gandi-Paris
+ |  Admin State/Province:
+ |  Admin Postal Code: 75013
+ |  Admin Country: FR
+ |  Admin Phone: +33.170377666
+ |  Admin Phone Ext:
+ |  Admin Fax: +33.143730576
+ |  Admin Fax Ext:
+ |  Admin Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
+ |  Tech ID: AK4345-GANDI
+ |  Tech Name: Antti Kurittu
+ |  Tech Organization:
+ |  Tech Street: Obfuscated whois Gandi-63-65 boulevard Massena
+ |  Tech City: Obfuscated whois Gandi-Paris
+ |  Tech State/Province:
+ |  Tech Postal Code: 75013
+ |  Tech Country: FR
+ |  Tech Phone: +33.170377666
+ |  Tech Phone Ext:
+ |  Tech Fax: +33.143730576
+ |  Tech Fax Ext:
+ |  Tech Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
+ |  Name Server: C.DNS.GANDI.NET
+ |  Name Server: B.DNS.GANDI.NET
+ |  Name Server: A.DNS.GANDI.NET
+ |  DNSSEC: unsigned
+ |  >>> Last update of WHOIS database: 2016-01-23T12:50:59Z <<<
+ |  
+ |  "For more information on Whois status codes, please visit https://icann.org/epp"
+ |  
+ |  Access to Public Interest Registry WHOIS information is provided to assist persons in determining the contents of a domain name registration record in the Public Interest Registry registry database. The data in this record is provided by Public Interest Registry for informational purposes only, and Public Interest Registry does not guarantee its accuracy. This service is intended only for query-based access. You agree that you will use this data only for lawful purposes and that, under no circumstances will you use this data to(a) allow, enable, or otherwise support the transmission by e-mail, telephone, or facsimile of mass unsolicited, commercial advertising or solicitations to entities other than the data recipient's own existing customers; or (b) enable high volume, automated, electronic processes that send queries or data to the systems of Registry Operator, a Registrar, or Afilias except as reasonably necessary to register domain names or modify existing registrations. All rights reserved. Public Interest Registry reserves the right to modify these terms at any time. By submitting this query, you agree to abide by this policy.
+[+] Querying GeoIP City database for 188.166.129.94...
+ |  
+ |  city: Amsterdam
+ |  region_name: Noord-Holland
+ |  region: 07
+ |  area_code: 0
+ |  time_zone: Europe/Amsterdam
+ |  longitude: 4.91669988632
+ |  metro_code: 0
+ |  country_code3: NLD
+ |  latitude: 52.3499984741
+ |  postal_code: 1000
+ |  dma_code: 0
+ |  country_code: NL
+ |  country_name: Netherlands
+ |  Google maps link for location: https://maps.google.com/maps?q=52.3499984741,4.91669988632
+ |  
+[+] Querying VirusTotal for 188.166.129.94...
+[+] VirusTotal response code 1 IP address in dataset
+ |  
+ |  Hostname: kurittu.org Last resolved: 2016-01-21 00:00:00
+ |  
+[+] Detections in this address:
+ |  
+ |  
+[+] Querying PassiveTotal for 188.166.129.94...
+ |  
+ |  Query: 188.166.129.94
+ |  First Seen: 2016-01-09 02:53:45
+ |  Last Seen: 2016-01-22 05:26:28
+ |  Resolve Count:  5
+ |  Resolutions
+ |  ==>  evil.host 	2016-01-18 12:55:19 	2016-01-22 05:26:28 	kaspersky
+ |  ==>  kurittu.org 	2016-01-21 23:37:15 	2016-01-21 23:37:15 	kaspersky
+ |  ==>  evil.host 	2016-01-18 12:55:19 	2016-01-21 06:08:48 	kaspersky
+ |  ==>  kurittu.org 	2016-01-21 00:00:00 	2016-01-21 00:00:00 	virustotal
+ |  ==>  evil.host 	2016-01-09 02:53:45 	2016-01-19 06:20:15 	riskiq, pingly, kaspersky
+ |  
+[+] Scanning common ports...
+ |  
+ |  Scanning port 20...
+ |  Scanning port 22...
+ |  Scanning port 23...
+ |  Scanning port 25...
+ |  Scanning port 53...
+ |  port 53 is open.
+ |  Scanning port 80...
+ |  port 80 is open.
+ |  Scanning port 8000...
+ |  Scanning port 8080...
+ |  Scanning port 8081...
+ |  Scanning port 8088...
+ |  Scanning port 6667...
+ |  Scanning port 6668...
+ |  Scanning port 123...
+ |  Scanning port 156...
+ |  Scanning port 443...
+ |  port 443 is open.
+ |  Scanning port 10000...
+ |  
+[*] Writing log file to output-sample.txt
+[*] Done.
