@@ -193,8 +193,8 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
               req = requests.get(sourceurl, stream=True)
               filesize = req.headers.get('content-length')
               if not filesize:
-                  # Assuming no headers
-                  sys.stdout.write(gfx.FAIL + bcolors.FAIL + "No headers received, can't display progress." + bcolors.ENDC)
+                  # Assuming no content-length header
+                  sys.stdout.write(gfx.PLUS + "Content length not received, can't display progress." + bcolors.ENDC)
                   data = req.content
                   cType = "text/plain"
               else:
