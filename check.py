@@ -194,7 +194,6 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
       partial = targetHostname.split(".")
       sourcesCount = len(sourceListURL)
       print gfx.PLUS + "Downloading from %s [%s of %s sources]:" % (sourceurl, i, sourcesCount) + bcolors.ENDC
-      if 1==1:
       try:
           data = ""
           req = requests.get(sourceurl, stream=True)
