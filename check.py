@@ -111,12 +111,12 @@ try:
     VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
 except KeyError:
     VirusTotalAPIKey = ""
-    print gfx.FAIL + bcolors.FAIL + "Error: VirusTotal API key not present."
+    print gfx.FAIL + bcolors.FAIL + "Error: VirusTotal API key not present. Add \"$ export VTAPIKEY=yourapikey\" to your startup script." + bcolors.ENDC
 try:
     PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
 except KeyError:
     PassiveTotalAPIKey = ""
-    print gfx.FAIL + bcolors.FAIL + "Error: PassiveTotal API key not present."
+    print gfx.FAIL + bcolors.FAIL + "Error: PassiveTotal API key not present. Add \"$ export PTAPIKEY=yourapikey\" to your startup script." + bcolors.ENDC
 
 logfile = "" # Set variable as blank to avoid errors further on.
 
@@ -342,30 +342,33 @@ else:
 ### GEOIP
 
 if commandlineArgument.geoip or commandlineArgument.all or commandlineArgument.allnotnoisy:
-    latitude = ""
-    longitude = latitude
-    try:
-        gi = GeoIP.open(GeoIPDatabaseFile, GeoIP.GEOIP_STANDARD)
-        gir = gi.record_by_addr(targetIPaddress)
-    except Exception:
-        print gfx.FAIL + bcolors.FAIL + "Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/"
-        exit()
-    print bcolors.HEADER + gfx.PLUS + "Querying GeoIP City database for " + targetIPaddress + "..." + bcolors.ENDC
-    if gir is None:
-     print "[!] "+ bcolors.FAIL + "No geodata."
+    if os.path.isfile(GeoIPDatabaseFile) == True:
+        latitude = ""
+        longitude = latitude
+        try:
+            gi = GeoIP.open(GeoIPDatabaseFile, GeoIP.GEOIP_STANDARD)
+            gir = gi.record_by_addr(targetIPaddress)
+            print bcolors.HEADER + gfx.PLUS + "Querying GeoIP database for " + targetIPaddress + "..." + bcolors.ENDC
+            if gir is None:
+                print gfx.FAIL + bcolors.FAIL + "No geodata found for IP address." + bcolors.ENDC
+            else:
+                print gfx.PIPE + bcolors.ENDC
+                for key, value in gir.iteritems():
+                    if key == "latitude":
+                        latitude = value
+                    elif key == "longitude":
+                        longitude = value
+                    print gfx.PIPE + str(key) + ": " + str(value)
+                if latitude != "" and longitude != "":
+                    print gfx.PIPE + "Google maps link for location: " + bcolors.UNDERLINE + "https://maps.google.com/maps?q="+str(latitude)+","+str(longitude) + bcolors.ENDC
+                print gfx.PIPE + bcolors.ENDC
+                if commandlineArgument.open:
+                    webbrowser.open('https://maps.google.com/maps?q='+str(latitude)+','+str(longitude))
+        except Exception:
+            print gfx.FAIL + bcolors.FAIL + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
     else:
-      print gfx.PIPE + bcolors.ENDC
-      for key, value in gir.iteritems():
-        if key == "latitude":
-          latitude = value
-        elif key == "longitude":
-          longitude = value
-        print gfx.PIPE + str(key) + ": " + str(value)
-      if latitude != "" and longitude != "":
-        print gfx.PIPE + "Google maps link for location: " + bcolors.UNDERLINE + "https://maps.google.com/maps?q="+str(latitude)+","+str(longitude) + bcolors.ENDC
-        print gfx.PIPE + bcolors.ENDC
-        if commandlineArgument.open:
-          webbrowser.open('https://maps.google.com/maps?q='+str(latitude)+','+str(longitude))
+        print gfx.FAIL + bcolors.FAIL + "Database not found at ", GeoIPDatabaseFile + bcolors.ENDC
+        print gfx.FAIL + bcolors.FAIL + "Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/" + bcolors.ENDC
 else:
     print bcolors.WARNING + gfx.MINUS + "Skipping GeoIP. Enable with argument \"--geoip\" or \"-g\""
 
@@ -383,17 +386,18 @@ if (commandlineArgument.virustotal or commandlineArgument.all or commandlineArgu
     print bcolors.OKGREEN + gfx.PLUS + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + bcolors.ENDC
     print gfx.PIPE
     for entry in vtresponse_dict['resolutions']:
-      print gfx.PIPE + "Hostname:", entry['hostname'], "Last resolved:", entry['last_resolved']
+      print gfx.PIPE + " =>", entry['hostname'], "Last resolved:", entry['last_resolved']
     print gfx.PIPE
-    print bcolors.OKGREEN + gfx.PLUS + "Detections in this address:" + bcolors.ENDC
-    print gfx.PIPE
-    for entry in vtresponse_dict['detected_urls']:
-      print gfx.PIPE + entry['url'].replace("http", "hxxp") + bcolors.ENDC
-      if entry['positives'] >= 1:
-        print gfx.PIPE + "Positives: ", bcolors.FAIL + str(entry['positives']) + bcolors.ENDC, "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
-      else:
-        print gfx.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
-    print gfx.PIPE
+    if len(vtresponse_dict['detected_urls']) >= 1:
+        print bcolors.OKGREEN + gfx.PLUS + "Detections in this address:" + bcolors.ENDC
+        print gfx.PIPE
+        for entry in vtresponse_dict['detected_urls']:
+          print gfx.PIPE + entry['url'].replace("http", "hxxp") + bcolors.ENDC
+          if entry['positives'] >= 1:
+            print gfx.PIPE + "Positives: ", bcolors.FAIL + str(entry['positives']) + bcolors.ENDC, "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
+          else:
+            print gfx.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
+        print gfx.PIPE
 else:
   print bcolors.WARNING + gfx.MINUS + "Skipping VirusTotal passive DNS, Enable with \"--virustotal\" or \"-vt\"" + bcolors.ENDC
 
