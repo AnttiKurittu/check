@@ -14,6 +14,21 @@ It currently does the following things:
 - Check common ports for available services<br>
 - Try to retrieve and show HTTP headers from said ports<br>
 
+# Who needs this?
+
+<p>I wrote this to quickly pull information on an network address of interest.
+Usually to gather this information you need to run several commands and access
+several websites - this script gathers everything in one place and formats the
+output in a pleasing manner. With basic usage of "check.py -d example.com -a"
+you can run all modules and save the output in a log file. For processing the
+log file later on you can suppress colour and graphics.</p>
+
+This might be useful for sysadmins, secops, investigators or whoever needs
+to quickly and efficiently assess a network resource.
+
+With default options it <i>does</i> contact the host directly, but there modules
+that query external resources which can pull a lot of interesting information.
+
 <p>It is also the <i>first thing I've written in Python</i> so that's what it looks like.</p>
 
 Export your API keys as environmental variables;<br>
