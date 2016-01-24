@@ -161,6 +161,7 @@ else:
 ### MALWAREBLOCKLISTS
 
 if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgument.allnotnoisy or commandlineArgument.listsonly:
+  totalLines = 0
   if os.path.isfile(malwareSourceFile) == True:
       with open(malwareSourceFile) as sourcefile:
         sourceListLine = sourcefile.readlines()
@@ -170,7 +171,7 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
               continue
           else:
               sourceCount += 1
-      print bcolors.HEADER + gfx.STAR + "Checking malware blocklists for domain name and IP address." + bcolors.ENDC
+      print bcolors.HEADER + gfx.STAR + "Downloading and searching malware blocklists for domain name and IP address." + bcolors.ENDC
       i = 0
       for sourceline in sourceListLine:
           sourceline = sourceline.split("|")
@@ -187,24 +188,33 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
           domainmatch = False
           ipmatch = False
           partial = targetHostname.split(".")
-          print gfx.PLUS + "Downloading from %s [%s of %s sources]:" % (sourcename, i, sourceCount) + bcolors.ENDC
-          try:
+          print gfx.PLUS + "Downloading from " + bcolors.BOLD + sourcename + bcolors.ENDC + " [%s of %s sources]:" % (i, sourceCount) + bcolors.ENDC
+          if 1==1:
               data = ""
               req = requests.get(sourceurl, stream=True)
               filesize = req.headers.get('content-length')
               if not filesize:
                   # Assuming no content-length header
-                  sys.stdout.write(gfx.PLUS + "Content length not received, can't display progress." + bcolors.ENDC)
+                  sys.stdout.write(gfx.PIPE + "[" + bcolors.OKGREEN + "...................." + bcolors.ENDC + "] Content-length not received." + bcolors.ENDC)
                   data = req.content
                   cType = "text/plain"
               else:
                   cType = req.headers.get('content-type')
-                  sys.stdout.write(gfx.PLUS + "[          ] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + cType + " \r" + gfx.PLUS + "[")
-                  percent = int(filesize) / 10
-                  for chunk in req.iter_content(percent):
-                      sys.stdout.write(bcolors.OKGREEN + "#" + bcolors.ENDC)
-                      sys.stdout.flush()
+                  if not cType:
+                      cType = "text/plain"
+                  sys.stdout.write(gfx.PIPE + "[" + bcolors.FAIL + "                    " + bcolors.ENDC + "] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + str(cType) + " \r" + gfx.PIPE + "[")
+                  part = int(filesize) / 20
+                  c = 0
+                  for chunk in req.iter_content(part):
+                      c += 1
+                      if c <= 20:
+                          sys.stdout.write(bcolors.OKGREEN + "." + bcolors.ENDC)
+                          sys.stdout.flush()
                       data = data + chunk
+                  while c < 20:
+                      c += 1
+                      sys.stdout.write(bcolors.OKGREEN + "." + bcolors.ENDC)
+                      sys.stdout.flush()
               if "application/zip" in cType:
                   zip_file_object = zipfile.ZipFile(StringIO.StringIO(data))
                   first_file = zip_file_object.namelist()[0]
@@ -217,31 +227,31 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
                   listfile = data
               for line in listfile.splitlines():
                   linecount += 1
-              print "\r\n" + gfx.PLUS + "Searching from %s lines." % (linecount) + bcolors.ENDC
-              print gfx.PIPE
+              print "\r\n" + gfx.PIPE + "Searching from %s lines." % (linecount) + bcolors.ENDC
+              totalLines = totalLines + linecount
               for line in listfile.splitlines():
                 if targetHostname in line:
                   domainmatch = True
-                  print gfx.PIPE + bcolors.WARNING + "Matching domain: " + line + bcolors.ENDC
+                  print gfx.PIPE + bcolors.WARNING + "Domain match! " + bcolors.ENDC + line
                 if targetIPaddress in line:
                   ipmatch = True
-                  print gfx.PIPE + bcolors.WARNING + "Matching IP: " + line + bcolors.ENDC
+                  print gfx.PIPE + bcolors.WARNING + "IP match! " + bcolors.ENDC + line
                 if targetIPrange in line:
                   ipmatch = True
-                  print gfx.PIPE + bcolors.WARNING + "IP in range: " + line + bcolors.ENDC
+                  print gfx.PIPE + bcolors.WARNING + "Range match! " + bcolors.ENDC + line
 
               if domainmatch == False and ipmatch == True:
-                print gfx.PIPE + bcolors.OKGREEN + "Domain name not found." + bcolors.ENDC
+                print gfx.PIPE + "Domain name not found." + bcolors.ENDC
               elif ipmatch == False and domainmatch == True:
-                print gfx.PIPE + bcolors.OKGREEN + "IP address not found." + bcolors.ENDC
+                print gfx.PIPE + "IP address not found." + bcolors.ENDC
               else:
-                print gfx.PIPE + bcolors.OKGREEN + "Domain name or IP address not found." + bcolors.ENDC
+                print gfx.PIPE + "Domain name or IP address "+ bcolors.OKGREEN + "not found" + bcolors.ENDC + " in list." + bcolors.ENDC
 
-          except Exception:
-              print gfx.FAIL + bcolors.FAIL + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
-          print gfx.PIPE
+          #except Exception:
+              #print gfx.FAIL + bcolors.FAIL + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
   else:
     print gfx.FAIL + bcolors.FAIL + "No malwarelist file found at %s" & (malwareSourceFile)
+  print gfx.PLUS + "A total of %s lines searched." % (totalLines)
 else:
   print bcolors.WARNING + gfx.MINUS + "Skipping malwarelists query, Enable with \"--malwarelist\" or \"-ml\"" + bcolors.ENDC
 
