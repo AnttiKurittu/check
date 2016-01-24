@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #coding=UTF-8
 
 ###### check.py ################################################################
@@ -25,8 +24,7 @@
 #
 ###### check.py ################################################################
 
-import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP
-from StringIO import StringIO
+import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP, StringIO
 from passivetotal import PassiveTotal
 from IPy import IP
 
@@ -105,8 +103,7 @@ else:
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
 targetPortscan = [20, 22, 23, 25, 53, 80, 8000, 8080, 8081, 8088, 6667, 6668, 123, 156, 443, 10000] # What ports to scan
-sourceListURL = ['http://www.malware-domains.com/files/domains.zip', 'http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist',
-'https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist', 'https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset']
+sourceListURL = ['http://www.malware-domains.com/files/domains.zip', 'http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist', 'https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist', 'https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset']
 sourceListSpamDNS = ["zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org", "virbl.dnsbl.bit.nl", "dnsbl.inps.de",
 "ix.dnsbl.manitu.net", "dnsbl.sorbs.net", "bl.spamcannibal.org", "bl.spamcop.net", "xbl.spamhaus.org", "pbl.spamhaus.org",
 "dnsbl-1.uceprotect.net", "dnsbl-2.uceprotect.net", "dnsbl-3.uceprotect.net", "db.wpbl.info"] # What sources to query for malwarelists
@@ -172,11 +169,14 @@ if not commandlineArgument.nolog:
     def __init__(self, filename = logfile):
         self.terminal = sys.stdout
         self.log = open(filename, "w")
-
     def write(self, message):
         self.terminal.write(message)
         self.log.write(message)
+    def flush(self):
+        self.terminal.flush()
+
   sys.stdout = Logger(logfile)
+
 else:
   print bcolors.WARNING + gfx.MINUS + "Skipping log file." + bcolors.ENDC
 
@@ -184,26 +184,47 @@ else:
 
 if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgument.allnotnoisy or commandlineArgument.listsonly:
   print bcolors.HEADER + gfx.STAR + "Checking malware blocklists for domain name and IP address." + bcolors.ENDC
+  i = 0
   for sourceurl in sourceListURL:
+      i += 1
       listfile = ""
       linecount = 0
       domainmatch = False
       ipmatch = False
       partial = targetHostname.split(".")
-      print gfx.PLUS + "Downloading from %s..." % (sourceurl) + bcolors.ENDC
+      sourcesCount = len(sourceListURL)
+      print gfx.PLUS + "Downloading from %s [%s of %s sources]:" % (sourceurl, i, sourcesCount) + bcolors.ENDC
+      if 1==1:
       try:
-          if sourceurl[-4:] == ".zip":
-              filehandle, _ = urllib.urlretrieve(sourceurl)
-              zip_file_object = zipfile.ZipFile(filehandle, 'r')
+          data = ""
+          req = requests.get(sourceurl, stream=True)
+          filesize = req.headers.get('content-length')
+          if not filesize:
+              # Assuming no headers
+              sys.stdout.write(gfx.FAIL + bcolors.FAIL + "No headers received, can't display progress." + bcolors.ENDC)
+              data = req.content
+              cType = "text/plain"
+          else:
+              cType = req.headers.get('content-type')
+              sys.stdout.write(gfx.PLUS + "[          ] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + cType + " \r" + gfx.PLUS + "[")
+              percent = int(filesize) / 10
+              for chunk in req.iter_content(percent):
+                  sys.stdout.write(bcolors.OKGREEN + "#" + bcolors.ENDC)
+                  sys.stdout.flush()
+                  data = data + chunk
+          if "application/zip" in cType:
+              zip_file_object = zipfile.ZipFile(StringIO.StringIO(data))
               first_file = zip_file_object.namelist()[0]
               file = zip_file_object.open(first_file)
               listfile = file.read()
+          elif "text/plain" in cType or "application/csv" in cType:
+              listfile = data
           else:
-              file = urllib2.urlopen(sourceurl)
-              listfile = file.read()
+              print gfx.FAIL + bcolors.FAIL + "Unknown content type:", cType, ". Treating as plaintext."
+              listfile = data
           for line in listfile.splitlines():
               linecount += 1
-          print gfx.PLUS + "Received %s lines." % (linecount) + bcolors.ENDC
+          print "\r\n" + gfx.PLUS + "Searching from %s lines." % (linecount) + bcolors.ENDC
           print gfx.PIPE
           for line in listfile.splitlines():
             if targetHostname in line:
@@ -216,12 +237,15 @@ if commandlineArgument.malwarelist or commandlineArgument.all or commandlineArgu
               ipmatch = True
               print gfx.PIPE + bcolors.WARNING + "IP in range: " + line + bcolors.ENDC
 
-          if domainmatch == False:
-            print gfx.PIPE + bcolors.OKGREEN + "Domain name is not listed." + bcolors.ENDC
-          if ipmatch == False:
-            print gfx.PIPE + bcolors.OKGREEN + "IP address is not listed." + bcolors.ENDC
+          if domainmatch == False and ipmatch == True:
+            print gfx.PIPE + bcolors.OKGREEN + "Domain name not found." + bcolors.ENDC
+          elif ipmatch == False and domainmatch == True:
+            print gfx.PIPE + bcolors.OKGREEN + "IP address not found." + bcolors.ENDC
+          else:
+            print gfx.PIPE + bcolors.OKGREEN + "Domain name or IP address not found." + bcolors.ENDC
+
       except Exception:
-          print "Failed: ", str(sys.exc_info()[1])
+          print gfx.FAIL + bcolors.FAIL + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
       print gfx.PIPE
 
 else:
