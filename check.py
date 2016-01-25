@@ -141,9 +141,9 @@ if not commandlineArgument.nolog:
     logfile = commandlineArgument.logfile
   else:
     if commandlineArgument.domain:
-        logfile = "check-" + targetHostname + "-"+ currentDateTime + ".log"
+        logfile = "log/check-" + targetHostname + "-"+ currentDateTime + ".log"
     else:
-        logfile = "check-" + targetIPaddress + "-"+ currentDateTime + ".log"
+        logfile = "log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
   class Logger(object):
     def __init__(self, filename = logfile):
         self.terminal = sys.stdout
