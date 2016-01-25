@@ -242,7 +242,7 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
                 () # Deprecated
             elif key == "2":
                 () # Deprecated
-            elif key == "0":
+            elif key == "0" or key == "4":
                 hasKeys = True
                 if int(value[0]) >= 0:
                     assessment = clr.R + "Very poor" + clr.END
@@ -254,20 +254,10 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
                     assessment = clr.G + "Good" + clr.END
                 if int(value[0]) >= 80:
                     assessment = clr.G + "Excellent" + clr.END
-                print gfx.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
-            elif key == "4":
-                hasKeys = True
-                if int(value[0]) >= 0:
-                    assessment = clr.R + "Very poor" + clr.END
-                if int(value[0]) >= 20:
-                    assessment = clr.R + "Poor" + clr.END
-                if int(value[0]) >= 40:
-                    assessment = clr.Y + "Unsatisfactory" + clr.END
-                if int(value[0]) >= 60:
-                    assessment = clr.G + "Good" + clr.END
-                if int(value[0]) >= 80:
-                    assessment = clr.G + "Excellent" + clr.END
-                print gfx.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                if key == "0":
+                    print gfx.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                elif key == "4":
+                    print gfx.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
             elif key == "categories":
                 print gfx.PIPE
                 hasKeys = True
