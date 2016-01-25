@@ -112,15 +112,10 @@ except KeyError:
     print gfx.FAIL + clr.R + "Error: Web Of Trust API key not present. Add \"$ export WOTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://www.mywot.com/wiki/API" + clr.END
 
 def validate_ip(s): # Validate IP address format
-    a = s.split('.')
-    if len(a) != 4:
+    try:
+        socket.inet_aton(s)
+    except Exception:
         return False
-    for x in a:
-        if not x.isdigit():
-            return False
-        i = int(x)
-        if i < 0 or i > 255:
-            return False
     return True
 
 if cliArg.ip and cliArg.domain:
