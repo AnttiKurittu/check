@@ -2,7 +2,9 @@
 
 # See https://github.com/AnttiKurittu/check/ for details.
 
-import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP, StringIO, operator
+import datetime
+startTime = datetime.datetime.now()
+import os, sys, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP, StringIO, operator
 from passivetotal import PassiveTotal
 from IPy import IP
 
@@ -262,15 +264,14 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
                 hasKeys = True
                 for e,s in value.iteritems():
                     print gfx.PIPE + "Category:\t %s \t[%s%% confidence]" % (categories[e], s)
+                print gfx.PIPE
             elif key == "blacklists":
                 hasKeys = True
                 for e,s in value.iteritems():
                     print gfx.PIPE + "Blacklisted:\t %s \tID: %s" % (e, s)
             else:
                 print "Unknown key", key, " => ", value
-        print gfx.PIPE
     if hasKeys == False:
-        print gfx.PIPE
         print gfx.PIPE + clr.G + "Server response OK, no records for", targetHostname + clr.END
         print gfx.PIPE
     if reply.status_code != 200:
@@ -583,7 +584,7 @@ else:
   print clr.Y + gfx.MINUS + "Skipping ping, Enable pinging with \"--ping\" or \"-P\"" + clr.END
 
 ### SCANPORTS & SCANHEADERS
-if cliArg.scanports or cliArg.probes or cliArg.all:
+if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
     print clr.HDR + gfx.PLUS + "Scanning common ports..." + clr.END
     print gfx.PIPE + clr.END
     socket.setdefaulttimeout(1)
@@ -623,9 +624,11 @@ else:
 if logfile != "":
   print clr.HDR + gfx.STAR + "Writing log file to " + logfile + clr.END
 
-if runerrors == True:
-    print clr.Y + gfx.STAR + "Done, with errors." + clr.END
-else:
-    print clr.HDR + gfx.STAR + "Done, no errors." + clr.END
+stopTime = datetime.datetime.now()
+totalTime = stopTime - startTime
 
+if runerrors == True:
+    print clr.Y + gfx.STAR + "Done, with errors. Runtime %s seconds." % totalTime.seconds + clr.END
+else:
+    print clr.HDR + gfx.STAR + "Done, no errors. Runtime %s seconds." % totalTime.seconds + clr.END
 exit()
