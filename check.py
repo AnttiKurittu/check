@@ -2,7 +2,7 @@
 
 # See https://github.com/AnttiKurittu/check/ for details.
 
-import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP, StringIO
+import os, sys, datetime, socket, urllib, urllib2, json, argparse, webbrowser, subprocess, zipfile, dns.resolver, requests, GeoIP, StringIO, operator
 from passivetotal import PassiveTotal
 from IPy import IP
 
@@ -292,6 +292,7 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
           else:
               sourceCount += 1
       print clr.HDR + gfx.STAR + "Downloading and searching malware blocklists for domain name and IP address." + clr.END
+      print gfx.PIPE
       i = 0
       for sourceline in sourceListLine:
           sourceline = sourceline.split("|")
@@ -308,7 +309,7 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
           domainmatch = False
           ipmatch = False
           print gfx.PLUS + "Downloading from " + clr.BOLD + sourcename + clr.END + " [%s of %s sources]:" % (i, sourceCount) + clr.END
-          try:
+          if 1==1:
               data = ""
               req = requests.get(sourceurl, stream=True)
               filesize = req.headers.get('content-length')
@@ -335,9 +336,16 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
                       sys.stdout.write(clr.G + "." + clr.END)
                       sys.stdout.flush()
               if "application/zip" in cType:
+                  filelist = {}
                   zip_file_object = zipfile.ZipFile(StringIO.StringIO(data))
-                  first_file = zip_file_object.namelist()[0]
-                  file = zip_file_object.open(first_file)
+                  for info in zip_file_object.infolist(): # Get zip contents and put to a list
+                      filelist[info.filename] = info.file_size # Add files to a list
+                  sortedlist = sorted(filelist.items(), key=operator.itemgetter(1)) # Sort list by value; largest file is last
+                  for key, value in sortedlist: # Iterate over list - last assigned value is the largest file
+                      largestfile = key
+                      largestsize = value
+                  sys.stdout.write("\r\n" + gfx.PIPE + "Decompressing and using largest file in archive: %s (%s bytes)." % (largestfile, largestsize))
+                  file = zip_file_object.open(largestfile)
                   listfile = file.read()
               elif "text/plain" in cType or "application/csv" in cType:
                   listfile = data
@@ -359,7 +367,6 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
                 if targetIPrange in line:
                   ipmatch = True
                   print gfx.PIPE + clr.Y + "Range match! " + clr.END + line.replace(targetHostname, clr.R + targetIPrange + clr.END)
-
               if domainmatch == False and ipmatch == True:
                 print gfx.PIPE + "Domain name not found." + clr.END
               elif ipmatch == False and domainmatch == True:
@@ -367,13 +374,15 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
               else:
                 print gfx.PIPE + "Domain name or IP address "+ clr.G + "not found" + clr.END + " in list." + clr.END
 
-          except Exception:
-              print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
-              runerrors = True
+          #except Exception:
+              #print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
+              #runerrors = True
   else:
     print gfx.FAIL + clr.R + "No malwarelist file found at %s" & (malwareSourceFile)
     runerrors = True
-  print gfx.PLUS + "A total of %s lines searched." % (totalLines)
+  print gfx.PIPE
+  print gfx.PLUS + "A total of %s lines searched." % (totalLines) + clr.END
+  print gfx.PIPE
 else:
   print clr.Y + gfx.MINUS + "Skipping malwarelists query, Enable with \"--malwarelist\" or \"-ml\"" + clr.END
 
