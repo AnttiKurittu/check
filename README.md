@@ -4,19 +4,19 @@
 
 It currently does the following things (all or selectable):
 
-- Query Google Safe Browsing API for website reputation *<br>
-- Query Web Of Trust API for webiste reputation and categories *<br>
+- Query Google Safe Browsing API for website reputation<br>
+- Query Web Of Trust API for webiste reputation and categories.<br>
 - Query several domain- and IP blacklist sources for matches.<br>
-- Query PassiveDNS from PassiveTotal and VirusTotal * <br>
-- Query VirusTotal for matches coming from target address *<br>
-- Query WHOIS for domain name and IP address<br>
-- Query local GeoIP database<br>
-- Query spam blocklists for address<br>
-- Ping the host<br>
-- Check common ports for available services<br>
-- Try to retrieve and show HTTP headers from said ports<br>
+- Query PassiveDNS from PassiveTotal and VirusTotal.<br>
+- Query VirusTotal for matches coming from target address.<br>
+- Query WHOIS for domain name and IP address.<br>
+- Query local GeoIP database.<br>
+- Query spam blocklists for address.<br>
+- Ping the host.<br>
+- Check common ports for available services.<br>
+- Try to retrieve and show HTTP headers from said ports.<br>
 
-* Requires registration to the service and a free API key.
+<p>Some modules require registration to the service and a free API key.</p>
 
 # Who needs this?
 
