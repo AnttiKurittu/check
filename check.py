@@ -309,31 +309,48 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
           domainmatch = False
           ipmatch = False
           print gfx.PLUS + "Downloading from " + clr.BOLD + sourcename + clr.END + " [%s of %s sources]:" % (i, sourceCount) + clr.END
-          if 1==1:
+          try:
               data = ""
-              req = requests.get(sourceurl, stream=True)
+              try:
+                  req = requests.get(sourceurl, stream=True)
+              except requests.exceptions.ConnectionError:
+                  print gfx.PIPE + "[" + clr.R + "Fail!" + clr.END + "] Unable to connect to %s" % (sourcename)
+                  continue
+              try:
+                  cd = req.headers['Content-Disposition']
+              except Exception:
+                  cd = ""
               filesize = req.headers.get('content-length')
               if not filesize:
                   # Assuming no content-length header
-                  sys.stdout.write(gfx.PIPE + "[" + clr.G + "...................." + clr.END + "] Content-length not received." + clr.END)
+                  sys.stdout.write(gfx.PIPE + "[" + clr.G + "Done!" + clr.END + "] Content-length not received. " + cd + clr.END)
                   data = req.content
                   cType = "text/plain"
               else:
                   cType = req.headers.get('content-type')
                   if not cType:
                       cType = "text/plain"
-                  sys.stdout.write(gfx.PIPE + "[" + clr.R + "                    " + clr.END + "] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + str(cType) + " \r" + gfx.PIPE + "[")
-                  part = int(filesize) / 20
+                  sys.stdout.write(gfx.PIPE + "[" + clr.R + "     " + clr.END + "] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + str(cType) + " \r" + gfx.PIPE + "[")
+                  part = int(filesize) / 5
                   c = 0
                   for chunk in req.iter_content(part):
                       c += 1
-                      if c <= 20:
-                          sys.stdout.write(clr.G + "." + clr.END)
+                      if c <= 5:
+                          if c == 1:
+                              sys.stdout.write(clr.G + "D" + clr.END)
+                          if c == 2:
+                              sys.stdout.write(clr.G + "o" + clr.END)
+                          if c == 3:
+                              sys.stdout.write(clr.G + "n" + clr.END)
+                          if c == 4:
+                              sys.stdout.write(clr.G + "e" + clr.END)
+                          if c == 5:
+                              sys.stdout.write(clr.G + "!" + clr.END)
                           sys.stdout.flush()
                       data = data + chunk
-                  while c < 20:
+                  while c < 5: # Fill the meter if the chunks round down.
                       c += 1
-                      sys.stdout.write(clr.G + "." + clr.END)
+                      sys.stdout.write(clr.G + "!" + clr.END)
                       sys.stdout.flush()
               if "application/zip" in cType:
                   filelist = {}
@@ -374,9 +391,9 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
               else:
                 print gfx.PIPE + "Domain name or IP address "+ clr.G + "not found" + clr.END + " in list." + clr.END
 
-          #except Exception:
-              #print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
-              #runerrors = True
+          except Exception:
+              print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
+              runerrors = True
   else:
     print gfx.FAIL + clr.R + "No malwarelist file found at %s" & (malwareSourceFile)
     runerrors = True
