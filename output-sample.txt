@@ -1,109 +1,212 @@
-[*] Checking malware blocklists for domain name and IP address.
-[+] Downloading from http://www.malwaredomainlist.com/mdlcsv.php...
-[+] Received 3316 lines.
+[*] Downloading and searching malware blocklists for domain name and IP address.
+[+] Downloading from CleanMX Viruses [1 of 19 sources]:
+ |  [....................] Content-length not received.
+ |  Searching from 48001 lines.
+ |  Domain match! "7860","86401742","sub16","2016-01-24 21:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.org/ilogin/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "7861","86401738","sub16","2016-01-24 21:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.info/ilogin/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns2.dnsexit.com","ns1.dnsexit.com","ns4.dnsexit.com",""
+ |  Domain match! "7862","86401737","sub16","2016-01-24 21:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.org/ilogin/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "8712","86399700","sub16","2016-01-24 20:03:56","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.org/login/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns1.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com",""
+ |  Domain match! "8713","86399699","sub16","2016-01-24 20:03:56","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.info/login/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "8714","86399698","sub16","2016-01-24 20:03:56","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.org/login/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "8715","86399697","sub16","2016-01-24 20:03:56","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.info/login/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "8716","86399696","sub16","2016-01-24 20:03:55","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.com/login/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.com","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "11887","86391254","sub16","2016-01-24 14:03:15","1970-01-01 01:00:00","AVG","JS/Phish","http://sqhsa.com/ilogin/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","sqhsa.com","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","dns2.vps.net","dns1.vps.net","","",""
+ |  Domain match! "11954","86391063","sub16","2016-01-24 14:03:01","1970-01-01 01:00:00","Antiy_AVL","clean site","http://iaccountmessage.org/login/?email=abuse%20at%20example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.org","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "11960","86391057","sub16","2016-01-24 14:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.net/login/?email=abuseatexample.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.net","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "11961","86391056","sub16","2016-01-24 14:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.net/login/?email=abuse%20at%20example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.net","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "11967","86391050","sub16","2016-01-24 14:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.info/login/?email=abuse%20at%20example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.info","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns3.dnsexit.com","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "11973","86391044","sub16","2016-01-24 14:03:01","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.com/login/?email=abuse%20at%20example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.com","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12133","86389366","sub16","2016-01-24 12:32:35","1970-01-01 01:00:00","Antiy_AVL","clean site","http://icheckaccount.org/myappleid/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12134","86389363","sub16","2016-01-24 12:32:35","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.info/mypreferences/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12135","86389362","sub16","2016-01-24 12:32:35","1970-01-01 01:00:00","Antiy_AVL","clean site","http://icheckaccount.com/mypreferences/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.com","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12136","86389361","sub16","2016-01-24 12:32:35","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.com/ilogin/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.com","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12357","86387514","sub16","2016-01-24 12:03:47","1970-01-01 01:00:00","AVG","JS/Phish","http://imessagesupporttickets.net/sortprofile/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12358","86387512","sub16","2016-01-24 12:03:47","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupporttickets.net/appleidlogin/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12359","86387484","sub16","2016-01-24 12:03:45","1970-01-01 01:00:00","Antiy_AVL","clean site","http://icheckaccounts.net/mypreferences/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.net","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12360","86387482","sub16","2016-01-24 12:03:45","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.info/mypreferences/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns1.dnsexit.com","ns4.dnsexit.com","ns3.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12859","86386007","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupporttickets.net/myappleid/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12860","86386006","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","AVG","JS/Phish","http://imessagesupporttickets.net/managelogin/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12861","86386005","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupporttickets.net/login/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12867","86385999","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupporttickets.com/managelogin/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupporttickets.com","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12874","86385989","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupportticket.net/myaccount/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12876","86385987","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","AVG","JS/Phish","http://imessagesupportticket.net/appleidlogin/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.net","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12877","86385985","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupportticket.info/sortprofile/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.info","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12879","86385983","sub16","2016-01-24 11:03:11","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupportticket.info/myaccount/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.info","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12881","86385979","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","Antiy_AVL","clean site","http://imessagesupportticket.com/secureapple/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.com","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12882","86385978","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://imessagesupportticket.com/myappleid/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.com","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12883","86385977","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://imessagesupportticket.com/login/?email=abuse@example.com","up","alive","37.123.112.25","AS13213","37.123.112.25","imessagesupportticket.com","GB","RIPE","abuse@uk2group.com","37.123.112.0 - 37.123.112.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[UK2 InfrastructureUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12886","86385972","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","Antiy_AVL","clean site","http://icheckaccounts.org/mypreferences/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12887","86385971","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.org/myappleid/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12888","86385970","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.org/ilogin/?email==abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com",""
+ |  Domain match! "12890","86385967","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.net/myappleid/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.net","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12892","86385964","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.net/ilogin/?email=abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.net","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "12894","86385961","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccounts.info/ilogin/?email==abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccounts.info","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns3.dnsexit.com","ns2.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "12895","86385960","sub16","2016-01-24 11:03:10","1970-01-01 01:00:00","AVG","JS/Phish","http://icheckaccount.org/ilogin/?email==abuse@example.com","up","alive","176.67.168.250","AS13213","176.67.168.250","icheckaccount.org","GB","RIPE","ripe@uk2.net","176.67.160.0 - 176.67.175.255","UK-UK2NET-20110614","<![CDATA[UK2 - LtdUK2.NET announcement]]>","ns2.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "18174","86374641","sub16","2016-01-24 05:03:48","1970-01-01 01:00:00","Avast","JS:Injection-A Trj","http://clkhouseideas.webcam/decors/-d-bedeutung-smiley","up","alive","172.110.29.200","ASNA.172.110.0.0 - 172.110.31.255","172.110.29.200","clkhouseideas.webcam","US","ARIN","abuse@subnetlabs.com","172.110.0.0 - 172.110.31.255","SLL-3","<![CDATA[Subnet Labs LLC SLL-41 22 Raspberry Dr. Mechanicsburg PA 17050]]>","ns1.example.com","ns2.example.com","","",""
+ |  Domain match! "18928","86371985","sub16","2016-01-24 02:41:40","1970-01-01 01:00:00","AVG","JS/Phish","http://www.sqhsa.com/login/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","sqhsa.com","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","dns2.vps.net","dns1.vps.net","","",""
+ |  Domain match! "18929","86371983","sub16","2016-01-24 02:41:40","1970-01-01 01:00:00","AVG","JS/Phish","http://www.sqhsa.com/ilogin/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","sqhsa.com","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","dns2.vps.net","dns1.vps.net","","",""
+ |  Domain match! "20486","86365225","sub16","2016-01-24 02:35:55","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.org/login/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.org","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns4.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "20488","86365223","sub16","2016-01-24 02:35:55","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.org/ilogin/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.org","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns4.dnsexit.com","ns2.dnsexit.com","ns3.dnsexit.com","ns1.dnsexit.com",""
+ |  Domain match! "20492","86365219","sub16","2016-01-24 02:35:55","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.net/login/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.net","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns3.dnsexit.com","ns1.dnsexit.com","ns4.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "20497","86365213","sub16","2016-01-24 02:35:55","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.info/login/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.info","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns3.dnsexit.com","ns4.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  Domain match! "20501","86365208","sub16","2016-01-24 02:35:55","1970-01-01 01:00:00","AVG","JS/Phish","http://iaccountmessage.com/login/?email=abuse@example.com","up","alive","109.123.121.54","AS13213","109.123.121.54","iaccountmessage.com","GB","RIPE","ripe@uk2.net","109.123.121.0 - 109.123.121.255","UK2-INFRA-VPS-DOT-NET","<![CDATA[]]>","ns2.dnsexit.com","ns1.dnsexit.com","ns3.dnsexit.com","ns4.dnsexit.com",""
+ |  Domain match! "21347","86357445","sub16","2016-01-24 00:39:47","1970-01-01 01:00:00","Jiangmin","TrojanDownloader.JS.oo","http://xn--80ahduhhcdd2k.xn--p1ai/","up","alive","91.240.87.52","AS58293","91.240.87.52","xn--80ahduhhcdd2k.xn--p1ai","RU","RIPE","noabuse@ripe.net","91.240.84.0 - 91.240.87.255","SIMPLETELECOM-NET","<![CDATA[Prosto-Telecom Ltdroute object]]>","ns2.example.com","ns1.example.com","","",""
+ |  Domain match! "29868","86326144","sub16","2016-01-23 13:02:45","1970-01-01 01:00:00","AVG","JS/Phish","http://apaccountrestorations.org/appleidlogin/?email=abuse@example.com","up","alive","176.67.169.130","AS13213","176.67.169.130","apaccountrestorations.org","DE","RIPE","ripe@uk2.net","176.67.169.0 - 176.67.169.255","UK2-INFRA-VPS-DOT-NET-GERMANY","<![CDATA[]]>","ns4.dnsexit.com","ns3.dnsexit.com","ns1.dnsexit.com","ns2.dnsexit.com",""
+ |  IP address not found.
+[+] Downloading from Malware-domains.com [2 of 19 sources]:
+ |  [                    ] Filesize: 215 kb 	Content type: application/zip  |  [....................
+ |  Searching from 20056 lines.
+ |  Domain match! 		icloud-example.com	phishing	private	20150902
+ |  Domain match! 		disclaimerexample.com	phishing	phishtank.com	20151007
+ |  IP address not found.
+[+] Downloading from MalwareDomainList.com [3 of 19 sources]:
+ |  [....................] Content-length not received.
+ |  Searching from 3316 lines.
+ |  Domain match! "2012/12/14_13:59","4.whereinitaly.com/string/obscure-logs-useful.php","198.74.54.28","li571-28.members.linode.com.","Blackhole exploit kit 2.0","We Weave Web srl / Weave Web srl, We email@example.com","3595","0","US",
+ |  IP address not found.
+[+] Downloading from OpenPhish feed [4 of 19 sources]:
+ |  [                    ] Filesize: 287 kb 	Content type: text/plain  |  [....................
+ |  Searching from 3553 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from PhishTank CSV list [5 of 19 sources]:
+ |  [....................] Content-length not received.
+ |  Searching from 28177 lines.
+ |  Domain match! 3784032,http://icheckaccount.info/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784032,2016-01-24T17:05:54+00:00,yes,2016-01-25T03:07:28+00:00,yes,Apple
+ |  Domain match! 3784031,http://icheckaccount.org/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784031,2016-01-24T17:05:35+00:00,yes,2016-01-25T03:07:28+00:00,yes,Apple
+ |  Domain match! 3784030,http://icheckaccount.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784030,2016-01-24T17:05:11+00:00,yes,2016-01-25T03:06:14+00:00,yes,Apple
+ |  Domain match! 3784029,http://icheckaccount.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784029,2016-01-24T17:04:53+00:00,yes,2016-01-25T03:06:14+00:00,yes,Apple
+ |  Domain match! 3784027,http://icheckaccounts.info/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784027,2016-01-24T17:04:11+00:00,yes,2016-01-25T03:06:14+00:00,yes,Apple
+ |  Domain match! 3784026,http://icheckaccounts.org/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784026,2016-01-24T17:03:54+00:00,yes,2016-01-25T03:06:14+00:00,yes,Apple
+ |  Domain match! 3784025,http://icheckaccounts.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784025,2016-01-24T17:03:16+00:00,yes,2016-01-25T03:06:14+00:00,yes,Apple
+ |  Domain match! 3784024,http://icheckaccounts.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3784024,2016-01-24T17:02:57+00:00,yes,2016-01-25T03:05:00+00:00,yes,Apple
+ |  Domain match! 3783369,http://imessagesupporttickets.info/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783369,2016-01-24T08:24:59+00:00,yes,2016-01-24T13:53:53+00:00,yes,Apple
+ |  Domain match! 3783364,http://imessagesupporttickets.org/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783364,2016-01-24T08:24:38+00:00,yes,2016-01-24T13:55:06+00:00,yes,Apple
+ |  Domain match! 3783363,http://imessagesupporttickets.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783363,2016-01-24T08:24:19+00:00,yes,2016-01-24T13:53:53+00:00,yes,Apple
+ |  Domain match! 3783362,http://imessagesupporttickets.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783362,2016-01-24T08:23:44+00:00,yes,2016-01-24T13:50:13+00:00,yes,Apple
+ |  Domain match! 3783361,http://imessagesupportticket.info/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783361,2016-01-24T08:16:55+00:00,yes,2016-01-24T13:53:53+00:00,yes,Apple
+ |  Domain match! 3783360,http://imessagesupportticket.org/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783360,2016-01-24T08:16:13+00:00,yes,2016-01-24T13:53:53+00:00,yes,Other
+ |  Domain match! 3783359,http://imessagesupportticket.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783359,2016-01-24T08:15:41+00:00,yes,2016-01-24T13:53:53+00:00,yes,Apple
+ |  Domain match! 3783356,http://imessagesupportticket.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3783356,2016-01-24T08:14:47+00:00,yes,2016-01-24T13:50:13+00:00,yes,Apple
+ |  Domain match! 3781616,http://icheckaccounts.info/ilogin/?email==abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3781616,2016-01-23T08:39:57+00:00,yes,2016-01-23T23:10:54+00:00,yes,Apple
+ |  Domain match! 3779338,http://176.67.168.191/kycservices/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3779338,2016-01-22T18:40:32+00:00,yes,2016-01-23T02:29:53+00:00,yes,Google
+ |  Domain match! 3779025,http://37.123.112.25/myicloud/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3779025,2016-01-22T15:41:47+00:00,yes,2016-01-24T10:25:26+00:00,yes,Apple
+ |  Domain match! 3779024,http://imessagesupporttickets.net/updateprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3779024,2016-01-22T15:40:04+00:00,yes,2016-01-22T22:22:50+00:00,yes,Apple
+ |  Domain match! 3778927,http://imessagesupporttickets.net/managelogin/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3778927,2016-01-22T15:05:41+00:00,yes,2016-01-23T02:21:17+00:00,yes,Apple
+ |  Domain match! 3778920,http://imessagesupporttickets.com/managelogin/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3778920,2016-01-22T15:04:53+00:00,yes,2016-01-23T23:13:24+00:00,yes,Apple
+ |  Domain match! 3778900,http://imessagesupportticket.com/myappleid/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3778900,2016-01-22T14:50:22+00:00,yes,2016-01-23T06:47:30+00:00,yes,Apple
+ |  Domain match! 3778720,http://iaccountchecks.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3778720,2016-01-22T13:05:52+00:00,yes,2016-01-24T00:57:43+00:00,yes,Apple
+ |  Domain match! 3775822,http://iaccountmessage.info/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3775822,2016-01-21T08:01:30+00:00,yes,2016-01-25T00:07:10+00:00,yes,Apple
+ |  Domain match! 3775821,http://iaccountmessage.org/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3775821,2016-01-21T08:01:15+00:00,yes,2016-01-23T03:37:52+00:00,yes,Apple
+ |  Domain match! 3775820,http://iaccountmessage.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3775820,2016-01-21T08:00:47+00:00,yes,2016-01-23T03:36:38+00:00,yes,Apple
+ |  Domain match! 3775819,http://iaccountmessage.com/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3775819,2016-01-21T08:00:28+00:00,yes,2016-01-23T03:27:58+00:00,yes,Apple
+ |  Domain match! 3774365,http://109.123.121.54/ilogin/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3774365,2016-01-20T20:23:06+00:00,yes,2016-01-22T04:18:31+00:00,yes,Apple
+ |  Domain match! 3773938,http://iauthorization.net/sortprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3773938,2016-01-20T18:06:46+00:00,yes,2016-01-22T05:15:41+00:00,yes,Apple
+ |  Domain match! 3773933,http://iauthorization.net/updateprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3773933,2016-01-20T18:05:22+00:00,yes,2016-01-23T02:41:01+00:00,yes,Apple
+ |  Domain match! 3773928,http://iaccountmessage.org/ilogin/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3773928,2016-01-20T18:03:44+00:00,yes,2016-01-22T06:21:03+00:00,yes,Apple
+ |  Domain match! 3773923,http://iauthorization.net/myicloud/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3773923,2016-01-20T18:02:17+00:00,yes,2016-01-23T02:42:15+00:00,yes,Apple
+ |  Domain match! 3766539,http://imessagereactivation.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3766539,2016-01-18T01:47:45+00:00,yes,2016-01-18T23:01:14+00:00,yes,Apple
+ |  Domain match! 3707954,http://176.67.168.132/account/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3707954,2015-12-23T22:28:34+00:00,yes,2015-12-24T02:53:57+00:00,yes,Apple
+ |  Domain match! 3704668,http://appleicloudanalysis.com/mypreferences/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3704668,2015-12-22T13:07:39+00:00,yes,2015-12-31T15:49:12+00:00,yes,Apple
+ |  Domain match! 3703223,http://imessage-notice.net/account/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3703223,2015-12-21T15:22:45+00:00,yes,2016-01-23T22:16:01+00:00,yes,Apple
+ |  Domain match! 3703221,http://imessage-notice.biz/account/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3703221,2015-12-21T15:22:33+00:00,yes,2015-12-23T17:51:20+00:00,yes,Apple
+ |  Domain match! 3701066,http://imessage-audits.org/profile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3701066,2015-12-20T19:14:37+00:00,yes,2015-12-22T19:55:04+00:00,yes,Apple
+ |  Domain match! 3495994,http://iosrenewals.co.uk/sortprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495994,2015-09-28T19:45:22+00:00,yes,2015-09-29T21:55:05+00:00,yes,Apple
+ |  Domain match! 3495982,http://iosrenewals.co.uk/secureapple/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495982,2015-09-28T19:30:39+00:00,yes,2015-09-29T21:52:25+00:00,yes,Apple
+ |  Domain match! 3495974,http://iosrenewals.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495974,2015-09-28T19:22:38+00:00,yes,2015-10-31T15:24:28+00:00,yes,Apple
+ |  Domain match! 3495813,http://itunesrenewalinfo.com/mypreferences/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495813,2015-09-28T17:46:19+00:00,yes,2015-10-16T13:55:08+00:00,yes,Apple
+ |  Domain match! 3495812,http://itunesrenewals.net/login/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495812,2015-09-28T17:44:32+00:00,yes,2015-11-17T21:18:53+00:00,yes,Apple
+ |  Domain match! 3495807,http://itunesrenewals.org/secureapple/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495807,2015-09-28T17:42:48+00:00,yes,2015-10-02T13:34:43+00:00,yes,Apple
+ |  Domain match! 3495806,http://itunesrenewals.co.uk/service/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3495806,2015-09-28T17:41:32+00:00,yes,2015-11-04T21:42:30+00:00,yes,Apple
+ |  Domain match! 3492734,http://itunescarepass.eu/profile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3492734,2015-09-27T19:46:17+00:00,yes,2015-09-28T05:21:47+00:00,yes,Apple
+ |  Domain match! 3492732,http://itunescarepass.org.uk/servicelogin/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3492732,2015-09-27T19:43:11+00:00,yes,2015-10-22T17:25:05+00:00,yes,Apple
+ |  Domain match! 3492730,http://itunescarepass.co.uk/manageprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3492730,2015-09-27T19:41:33+00:00,yes,2015-10-02T00:43:04+00:00,yes,Apple
+ |  Domain match! 3492729,http://itunescarepass.net/mypreferences/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3492729,2015-09-27T19:39:41+00:00,yes,2015-09-28T05:26:50+00:00,yes,Apple
+ |  Domain match! 3492725,http://itunescarepass.org/myappleid/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3492725,2015-09-27T19:33:05+00:00,yes,2015-09-28T05:43:34+00:00,yes,Apple
+ |  Domain match! 3410489,http://login-password.arlington-office-furniture.com/conflict.php?Email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3410489,2015-08-21T13:12:20+00:00,yes,2015-12-09T22:20:56+00:00,yes,Hotmail
+ |  Domain match! 3408640,http://www.ipras2011vancouver.ca/wp-admin/bookmark/ii.php?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3408640,2015-08-20T15:24:07+00:00,yes,2015-10-16T11:13:09+00:00,yes,Hotmail
+ |  Domain match! 3169314,http://176.67.168.132/myprofile/?email=abuse@example.com,http://www.phishtank.com/phish_detail.php?phish_id=3169314,2015-05-02T23:56:17+00:00,yes,2015-05-03T01:49:22+00:00,yes,Apple
+ |  IP address not found.
+[+] Downloading from ZeuS tracker Domainlist [6 of 19 sources]:
+ |  [                    ] Filesize: 4 kb 	Content type: text/plain  |  [....................
+ |  Searching from 444 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from ZeuS tracker IP list [7 of 19 sources]:
+ |  [                    ] Filesize: 1 kb 	Content type: text/plain  |  [....................
+ |  Searching from 178 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Firehol level 1 combined set [8 of 19 sources]:
+ |  [                    ] Filesize: 25 kb 	Content type: text/plain; charset=utf-8  |  [....................
+ |  Searching from 6604 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Malc0de.com IP blacklists [9 of 19 sources]:
+ |  [                    ] Filesize: 2 kb 	Content type: text/plain  |  [....................
+ |  Searching from 380 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Dshield suspicious domains LOW SENSITIVITY (false positives) [10 of 19 sources]:
+ |  [                    ] Filesize: 33 kb 	Content type: text/plain; charset=UTF-8  |  [....................
+ |  Searching from 4568 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Dshield Block List [11 of 19 sources]:
+ |  [                    ] Filesize: 1 kb 	Content type: text/plain; charset=UTF-8  |  [....................
+ |  Searching from 56 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Dshield whitelist - known good domains [12 of 19 sources]:
+ |  [                    ] Filesize: 0 kb 	Content type: text/plain; charset=UTF-8  |  [....................
+ |  Searching from 35 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from DGA Feed [13 of 19 sources]:
+ |  [....................] Content-length not received.
+ |  Searching from 731736 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from The CI Army blacklist [14 of 19 sources]:
+ |  [                    ] Filesize: 3 kb 	Content type: text/plain  |  [....................
+ |  Searching from 680 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Emerging Threats Spamhaus DROP List rules. [15 of 19 sources]:
+ |  [                    ] Filesize: 15 kb 	Content type: text/plain  |  [....................
+ |  Searching from 64 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Emerging Threats Compromised IPs [16 of 19 sources]:
+ |  [                    ] Filesize: 5 kb 	Content type: text/plain  |  [....................
+ |  Searching from 1030 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Emerging Threats TOR BLOCK ruleset [17 of 19 sources]:
+ |  [                    ] Filesize: 81 kb 	Content type: text/plain  |  [....................
+ |  Searching from 223 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Emerging Threats TOR ruleset [18 of 19 sources]:
+ |  [                    ] Filesize: 680 kb 	Content type: text/plain  |  [....................
+ |  Searching from 1619 lines.
+ |  Domain name or IP address not found in list.
+[+] Downloading from Emerging Threats Botnet Command and Control drop rules. [19 of 19 sources]:
+ |  [                    ] Filesize: 103 kb 	Content type: text/plain  |  [....................
+ |  Searching from 260 lines.
+ |  Domain name or IP address not found in list.
+[+] A total of 850980 lines searched.
+[*] Querying spamlists for 93.184.216.34...
  |  
- |  Domain name is not listed.
- |  IP address is not listed.
+ |  IP: 93.184.216.34 is NOT listed in zen.spamhaus.org
+ |  IP: 93.184.216.34 is NOT listed in spam.abuse.ch
+ |  IP: 93.184.216.34 is NOT listed in cbl.abuseat.org
+ |  IP: 93.184.216.34 is NOT listed in virbl.dnsbl.bit.nl
+ |  IP: 93.184.216.34 is NOT listed in dnsbl.inps.de
+ |  IP: 93.184.216.34 is NOT listed in ix.dnsbl.manitu.net
+ |  IP: 93.184.216.34 is NOT listed in dnsbl.sorbs.net
+ |  IP: 93.184.216.34 is NOT listed in bl.spamcannibal.org
+ |  IP: 93.184.216.34 is NOT listed in bl.spamcop.net
+ |  IP: 93.184.216.34 is NOT listed in xbl.spamhaus.org
+ |  IP: 93.184.216.34 is NOT listed in pbl.spamhaus.org
+ |  IP: 93.184.216.34 is NOT listed in dnsbl-1.uceprotect.net
+ |  IP: 93.184.216.34 is NOT listed in dnsbl-2.uceprotect.net
+ |  IP: 93.184.216.34 is NOT listed in dnsbl-3.uceprotect.net
+ |  IP: 93.184.216.34 is NOT listed in db.wpbl.info
  |  
-[+] Downloading from https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist...
-[+] Received 443 lines.
- |  
- |  Domain name is not listed.
- |  IP address is not listed.
- |  
-[+] Downloading from https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist...
-[+] Received 176 lines.
- |  
- |  Domain name is not listed.
- |  IP address is not listed.
- |  
-[+] Downloading from https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset...
-[+] Received 6611 lines.
- |  
- |  Domain name is not listed.
- |  IP address is not listed.
- |  
-[+] Downloading from http://www.malware-domains.com/files/domains.zip...
-[+] Received 20056 lines.
- |  
- |  Domain name is not listed.
- |  IP address is not listed.
- |  
-[*] Querying spamlists for 188.166.129.94...
- |  
- |  IP: 188.166.129.94 is NOT listed in zen.spamhaus.org
- |  IP: 188.166.129.94 is NOT listed in spam.abuse.ch
- |  IP: 188.166.129.94 is NOT listed in cbl.abuseat.org
- |  IP: 188.166.129.94 is NOT listed in virbl.dnsbl.bit.nl
- |  IP: 188.166.129.94 is NOT listed in dnsbl.inps.de
- |  IP: 188.166.129.94 is NOT listed in ix.dnsbl.manitu.net
- |  IP: 188.166.129.94 is NOT listed in dnsbl.sorbs.net
- |  IP: 188.166.129.94 is NOT listed in bl.spamcannibal.org
- |  IP: 188.166.129.94 is NOT listed in bl.spamcop.net
- |  IP: 188.166.129.94 is NOT listed in xbl.spamhaus.org
- |  IP: 188.166.129.94 is NOT listed in pbl.spamhaus.org
- |  IP: 188.166.129.94 is NOT listed in dnsbl-1.uceprotect.net
- |  IP: 188.166.129.94 is NOT listed in dnsbl-2.uceprotect.net
- |  IP: 188.166.129.94 is NOT listed in dnsbl-3.uceprotect.net
- |  IP: 188.166.129.94 is NOT listed in db.wpbl.info
- |  
-[*] Fully Qualified Doman Name: 188.166.129.94
+[*] Fully Qualified Doman Name: 93.184.216.34
 [+] Pinging target, skip with CTRL-C...
  |  
- |  188.166.129.94 is responding to ping.
+ |  93.184.216.34 is responding to ping.
  |  
-[*] Querying IP Address 188.166.129.94
- |  
- |  
- |  
- |  
- |  
- |  NetRange:       188.0.0.0 - 188.255.255.255
- |  CIDR:           188.0.0.0/8
- |  NetName:        188-RIPE
- |  NetHandle:      NET-188-0-0-0-1
- |  Parent:          ()
- |  NetType:        Allocated to RIPE NCC
- |  OriginAS:
- |  Organization:   RIPE Network Coordination Centre (RIPE)
- |  RegDate:
- |  Updated:        2004-03-16
- |  Comment:        These addresses have been further assigned to users in
- |  Comment:        the RIPE NCC region. Contact information can be found in
- |  Comment:        the RIPE database at http://www.ripe.net/whois
- |  Ref:            http://whois.arin.net/rest/net/NET-188-0-0-0-1
- |  
- |  ResourceLink:  https://apps.db.ripe.net/search/query.html
- |  ResourceLink:  whois.ripe.net
- |  
- |  OrgName:        RIPE Network Coordination Centre
- |  OrgId:          RIPE
- |  Address:        P.O. Box 10096
- |  City:           Amsterdam
- |  StateProv:
- |  PostalCode:     1001EB
- |  Country:        NL
- |  RegDate:
- |  Updated:        2013-07-29
- |  Ref:            http://whois.arin.net/rest/org/RIPE
- |  
- |  ReferralServer:  whois://whois.ripe.net
- |  ResourceLink:  https://apps.db.ripe.net/search/query.html
- |  
- |  OrgAbuseHandle: ABUSE3850-ARIN
- |  OrgAbuseName:   Abuse Contact
- |  OrgAbusePhone:  +31205354444
- |  OrgAbuseEmail:  abuse@ripe.net
- |  OrgAbuseRef:    http://whois.arin.net/rest/poc/ABUSE3850-ARIN
- |  
- |  OrgTechHandle: RNO29-ARIN
- |  OrgTechName:   RIPE NCC Operations
- |  OrgTechPhone:  +31 20 535 4444
- |  OrgTechEmail:  hostmaster@ripe.net
- |  OrgTechRef:    http://whois.arin.net/rest/poc/RNO29-ARIN
- |  
- |  
- |  
+[*] Querying IP Address 93.184.216.34
  |  % This is the RIPE Database query service.
  |  % The objects are in RPSL format.
  |  %
@@ -113,149 +216,392 @@
  |  % Note: this output has been filtered.
  |  %       To receive output for a database update, use the "-B" flag.
  |  
- |  % Information related to '188.166.0.0 - 188.166.255.255'
+ |  % Information related to '93.184.216.0 - 93.184.216.255'
  |  
- |  % Abuse contact for '188.166.0.0 - 188.166.255.255' is 'abuse@digitalocean.com'
+ |  % Abuse contact for '93.184.216.0 - 93.184.216.255' is 'abuse@edgecast.com'
  |  
- |  inetnum:        188.166.0.0 - 188.166.255.255
- |  netname:        EU-DIGITALOCEAN-20090605
- |  descr:          Digital Ocean, Inc.
- |  country:        NL
- |  org:            ORG-DOI2-RIPE
- |  admin-c:        PT7353-RIPE
- |  tech-c:         PT7353-RIPE
- |  status:         ALLOCATED PA
- |  mnt-by:         RIPE-NCC-HM-MNT
- |  mnt-lower:      digitalocean
- |  mnt-routes:     digitalocean
- |  mnt-domains:    digitalocean
- |  created:        2014-11-17T16:36:42Z
- |  last-modified:  2015-11-19T16:14:23Z
+ |  inetnum:        93.184.216.0 - 93.184.216.255
+ |  netname:        EDGECAST-NETBLK-03
+ |  descr:          NETBLK-03-EU-93-184-216-0-24
+ |  country:        EU
+ |  admin-c:        DS7892-RIPE
+ |  tech-c:         DS7892-RIPE
+ |  status:         ASSIGNED PA
+ |  mnt-by:         MNT-EDGECAST
+ |  created:        2012-06-22T21:48:41Z
+ |  last-modified:  2012-06-22T21:48:41Z
  |  
- |  organisation:   ORG-DOI2-RIPE
- |  org-name:       Digital Ocean, Inc.
- |  org-type:       LIR
- |  address:        101 Ave of the Americas
- |                  10th Floor
- |  address:        New York
- |  address:        10013
- |  address:        UNITED STATES
- |  phone:          +1 888 890 6714
- |  mnt-ref:        digitalocean
- |  mnt-ref:        RIPE-NCC-HM-MNT
- |  mnt-by:         RIPE-NCC-HM-MNT
- |  abuse-mailbox:  abuse@digitalocean.com
- |  abuse-c:        AD10778-RIPE
- |  created:        2012-11-29T14:59:01Z
- |  last-modified:  2015-11-19T16:11:55Z
- |  
- |  person:         Network Operations
- |  address:        101 Ave of the Americas, 10th Floor, New York, NY 10013
- |  phone:          +13478756044
- |  nic-hdl:        PT7353-RIPE
- |  mnt-by:         digitalocean
- |  created:        2015-03-11T16:37:07Z
- |  last-modified:  2015-11-19T15:57:21Z
- |  org:            ORG-DOI2-RIPE
+ |  person:         Derrick Sawyer
+ |  address:        2850 Ocean Park Blvd., Suite 200, Santa Monica CA 90405 USA
+ |  phone:          +18773343236
+ |  nic-hdl:        DS7892-RIPE
+ |  created:        2010-08-25T18:44:19Z
+ |  last-modified:  2012-04-17T16:42:54Z
+ |  mnt-by:         MNT-EDGECAST
  |  
  |  % This query was served by the RIPE Database Query Service version 1.84.1 (DB-2)
  |  
  |  
-[+] Resolved address 188.166.129.94 for domain kurittu.org
- |  Domain Name: KURITTU.ORG
- |  Domain ID: D179273275-LROR
- |  WHOIS Server:
- |  Referral URL: http://www.gandi.net
- |  Updated Date: 2016-01-20T13:20:08Z
- |  Creation Date: 2016-01-20T13:20:07Z
- |  Registry Expiry Date: 2021-01-20T13:20:07Z
- |  Sponsoring Registrar: Gandi SAS
- |  Sponsoring Registrar IANA ID: 81
- |  Registrant ID: AK4345-GANDI
- |  Registrant Name: Antti Kurittu
- |  Registrant Organization:
- |  Registrant Street: Obfuscated whois Gandi-63-65 boulevard Massena
- |  Registrant City: Obfuscated whois Gandi-Paris
- |  Registrant State/Province:
- |  Registrant Postal Code: 75013
- |  Registrant Country: FR
- |  Registrant Phone: +33.170377666
- |  Registrant Phone Ext:
- |  Registrant Fax: +33.143730576
- |  Registrant Fax Ext:
- |  Registrant Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
- |  Admin ID: AK4345-GANDI
- |  Admin Name: Antti Kurittu
- |  Admin Organization:
- |  Admin Street: Obfuscated whois Gandi-63-65 boulevard Massena
- |  Admin City: Obfuscated whois Gandi-Paris
- |  Admin State/Province:
- |  Admin Postal Code: 75013
- |  Admin Country: FR
- |  Admin Phone: +33.170377666
- |  Admin Phone Ext:
- |  Admin Fax: +33.143730576
- |  Admin Fax Ext:
- |  Admin Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
- |  Tech ID: AK4345-GANDI
- |  Tech Name: Antti Kurittu
- |  Tech Organization:
- |  Tech Street: Obfuscated whois Gandi-63-65 boulevard Massena
- |  Tech City: Obfuscated whois Gandi-Paris
- |  Tech State/Province:
- |  Tech Postal Code: 75013
- |  Tech Country: FR
- |  Tech Phone: +33.170377666
- |  Tech Phone Ext:
- |  Tech Fax: +33.143730576
- |  Tech Fax Ext:
- |  Tech Email: bb908c585499c5ca469fe5a27b13e1a9-1877397@contact.gandi.net
- |  Name Server: C.DNS.GANDI.NET
- |  Name Server: B.DNS.GANDI.NET
- |  Name Server: A.DNS.GANDI.NET
- |  DNSSEC: unsigned
- |  >>> Last update of WHOIS database: 2016-01-23T12:50:59Z <<<
+[+] Resolved address 93.184.216.34 for domain example.com
  |  
- |  "For more information on Whois status codes, please visit https://icann.org/epp"
+ |  Whois Server Version 2.0
  |  
- |  Access to Public Interest Registry WHOIS information is provided to assist persons in determining the contents of a domain name registration record in the Public Interest Registry registry database. The data in this record is provided by Public Interest Registry for informational purposes only, and Public Interest Registry does not guarantee its accuracy. This service is intended only for query-based access. You agree that you will use this data only for lawful purposes and that, under no circumstances will you use this data to(a) allow, enable, or otherwise support the transmission by e-mail, telephone, or facsimile of mass unsolicited, commercial advertising or solicitations to entities other than the data recipient's own existing customers; or (b) enable high volume, automated, electronic processes that send queries or data to the systems of Registry Operator, a Registrar, or Afilias except as reasonably necessary to register domain names or modify existing registrations. All rights reserved. Public Interest Registry reserves the right to modify these terms at any time. By submitting this query, you agree to abide by this policy.
-[+] Querying GeoIP City database for 188.166.129.94...
+ |  Domain names in the .com and .net domains can now be registered
+ |  with many different competing registrars. Go to http://www.internic.net
+ |  for detailed information.
  |  
- |  city: Amsterdam
- |  region_name: Noord-Holland
- |  region: 07
- |  area_code: 0
- |  time_zone: Europe/Amsterdam
- |  longitude: 4.91669988632
- |  metro_code: 0
- |  country_code3: NLD
- |  latitude: 52.3499984741
- |  postal_code: 1000
- |  dma_code: 0
- |  country_code: NL
- |  country_name: Netherlands
- |  Google maps link for location: https://maps.google.com/maps?q=52.3499984741,4.91669988632
+ |     Server Name: EXAMPLE.COM.AU
+ |     Registrar: ENETICA PTY LTD
+ |     Whois Server: whois.enetica.com.au
+ |     Referral URL: http://www.enetica.com.au
  |  
-[+] Querying VirusTotal for 188.166.129.94...
+ |  
+ |     Server Name: EXAMPLE.COM.FLORAMEIYUKWONG.COM
+ |     IP Address: 173.203.204.123
+ |     Registrar: GODADDY.COM, LLC
+ |     Whois Server: whois.godaddy.com
+ |     Referral URL: http://registrar.godaddy.com
+ |  
+ |  
+ |     Server Name: EXAMPLE.COM.RAFAELYALUFF.COM
+ |     IP Address: 173.203.204.123
+ |     Registrar: DOMAIN.COM, LLC
+ |     Whois Server: whois.domain.com
+ |     Referral URL: http://www.domain.com
+ |  
+ |  
+ |     Server Name: EXAMPLE.COM.ZONE
+ |     Registrar: NET-CHINESE CO., LTD.
+ |     Whois Server: whois.net-chinese.com.tw
+ |     Referral URL: http://www.net-chinese.com.tw
+ |  
+ |  
+ |     Domain Name: EXAMPLE.COM
+ |     Registrar: RESERVED-INTERNET ASSIGNED NUMBERS AUTHORITY
+ |     Sponsoring Registrar IANA ID: 376
+ |     Whois Server: whois.iana.org
+ |     Referral URL: http://res-dom.iana.org
+ |     Name Server: A.IANA-SERVERS.NET
+ |     Name Server: B.IANA-SERVERS.NET
+ |     Updated Date: 14-aug-2015
+ |     Creation Date: 14-aug-1995
+ |     Expiration Date: 13-aug-2016
+ |  
+ |  >>> Last update of whois database: Mon, 25 Jan 2016 05:19:31 GMT <<<
+ |  
+ |  For more information on Whois status codes, please visit
+ |  https://www.icann.org/resources/pages/epp-status-codes-2014-06-16-en.
+ |  
+ |  NOTICE: The expiration date displayed in this record is the date the
+ |  registrar's sponsorship of the domain name registration in the registry is
+ |  currently set to expire. This date does not necessarily reflect the expiration
+ |  date of the domain name registrant's agreement with the sponsoring
+ |  registrar.  Users may consult the sponsoring registrar's Whois database to
+ |  view the registrar's reported date of expiration for this registration.
+ |  
+ |  TERMS OF USE: You are not authorized to access or query our Whois
+ |  database through the use of electronic processes that are high-volume and
+ |  automated except as reasonably necessary to register domain names or
+ |  modify existing registrations; the Data in VeriSign Global Registry
+ |  Services' ("VeriSign") Whois database is provided by VeriSign for
+ |  information purposes only, and to assist persons in obtaining information
+ |  about or related to a domain name registration record. VeriSign does not
+ |  guarantee its accuracy. By submitting a Whois query, you agree to abide
+ |  by the following terms of use: You agree that you may use this Data only
+ |  for lawful purposes and that under no circumstances will you use this Data
+ |  to: (1) allow, enable, or otherwise support the transmission of mass
+ |  unsolicited, commercial advertising or solicitations via e-mail, telephone,
+ |  or facsimile; or (2) enable high volume, automated, electronic processes
+ |  that apply to VeriSign (or its computer systems). The compilation,
+ |  repackaging, dissemination or other use of this Data is expressly
+ |  prohibited without the prior written consent of VeriSign. You agree not to
+ |  use electronic processes that are automated and high-volume to access or
+ |  query the Whois database except as reasonably necessary to register
+ |  domain names or modify existing registrations. VeriSign reserves the right
+ |  to restrict your access to the Whois database in its sole discretion to ensure
+ |  operational stability.  VeriSign may restrict or terminate your access to the
+ |  Whois database for failure to abide by these terms of use. VeriSign
+ |  reserves the right to modify these terms at any time.
+ |  
+ |  The Registry database contains ONLY .COM, .NET, .EDU domains and
+ |  Registrars.
+ |  % IANA WHOIS server
+ |  % for more information on IANA, visit http://www.iana.org
+ |  % This query returned 1 object
+ |  
+ |  domain:       EXAMPLE.COM
+ |  
+ |  organisation: Internet Assigned Numbers Authority
+ |  
+ |  created:      1992-01-01
+ |  source:       IANA
+ |  
+[+] Querying GeoIP database for 93.184.216.34...
+ |  
+ |  city: Norwell
+ |  region_name: Massachusetts
+ |  region: MA
+ |  area_code: 781
+ |  time_zone: America/New_York
+ |  longitude: -70.8227996826
+ |  metro_code: 506
+ |  country_code3: USA
+ |  latitude: 42.1507987976
+ |  postal_code: 02061
+ |  dma_code: 506
+ |  country_code: US
+ |  country_name: United States
+ |  Google maps link for location: https://maps.google.com/maps?q=42.1507987976,-70.8227996826
+ |  
+[+] Querying VirusTotal for 93.184.216.34...
 [+] VirusTotal response code 1 IP address in dataset
  |  
- |  Hostname: kurittu.org Last resolved: 2016-01-21 00:00:00
+ |   => 52youlian.pub Last resolved: 2015-06-14 00:00:00
+ |   => alertmyarea.com Last resolved: 2016-01-04 00:00:00
+ |   => burstfiregame.com Last resolved: 2015-05-03 00:00:00
+ |   => cnwjaco.com Last resolved: 2016-01-06 00:00:00
+ |   => cnwjaco.de Last resolved: 2016-01-06 00:00:00
+ |   => cnwjaco.eu Last resolved: 2016-01-06 00:00:00
+ |   => csgosnack.net Last resolved: 2016-01-08 00:00:00
+ |   => csgosnack.org Last resolved: 2016-01-07 00:00:00
+ |   => delivered.me Last resolved: 2015-11-10 00:00:00
+ |   => example.com Last resolved: 2014-12-10 00:00:00
+ |   => example.net Last resolved: 2014-12-31 00:00:00
+ |   => example.org Last resolved: 2014-12-10 00:00:00
+ |   => imrek.org Last resolved: 2015-09-08 00:00:00
+ |   => iquyxa.ovh Last resolved: 2015-12-25 00:00:00
+ |   => jxqy589.com Last resolved: 2015-09-05 00:00:00
+ |   => krokerspinaz.com Last resolved: 2016-01-04 00:00:00
+ |   => medigymgmbh.de Last resolved: 2015-11-21 00:00:00
+ |   => projectcredits.ca Last resolved: 2015-09-23 00:00:00
+ |   => sakutraplin.com Last resolved: 2016-01-04 00:00:00
+ |   => t.delivr.com Last resolved: 2015-04-06 00:00:00
+ |   => www.easycounter.com Last resolved: 2015-02-25 00:00:00
+ |   => www.ecosdanoticia.com.br Last resolved: 2015-11-13 00:00:00
+ |   => www.example.com Last resolved: 2014-12-10 00:00:00
+ |   => www.example.net Last resolved: 2015-03-09 00:00:00
+ |   => www.example.org Last resolved: 2014-12-10 00:00:00
+ |   => www.medigym.com Last resolved: 2015-07-01 00:00:00
  |  
 [+] Detections in this address:
  |  
+ |  hxxp://example.org/
+ |  Positives:  1 	Total: 66 	Scan date: 2016-01-25 00:06:28
+ |  hxxp://example.org/verify.php
+ |  Positives:  1 	Total: 61 	Scan date: 2015-01-03 13:23:02
+ |  hxxp://example.org/egroupware/wiki/index.php?page=Pattern&action=xml&lang=en
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-31 17:32:50
+ |  hxxp://example.org/mtom/data</A>
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-30 04:11:27
+ |  hxxp://example.org/mtom/data
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-30 03:49:21
+ |  hxxp://example.org/2003/08/sdee
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-22 22:00:03
+ |  hxxp://example.org/index.php/taxonomy/tags/uncategorized/
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-22 15:06:31
+ |  hxxp://example.org/svn/listing.php?repname=
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-19 22:34:50
+ |  hxxps://example.org/mw/index.php?title=Sandbox/7&other=Sandbox/7&foo
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-19 15:15:01
+ |  hxxps://example.org:8443/subdir/test.php?abc=123
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-19 08:23:28
+ |  hxxp://example.org/subdir/test.php/extra_pathinfo?abc=123
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-19 08:23:27
+ |  hxxps://example.org/subdir/test.php?abc=123
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-19 08:23:28
+ |  hxxp://example.org/feedback.php
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-14 06:43:18
+ |  hxxp://example.org/mantis/view.php?id=%BUGID%
+ |  Positives:  1 	Total: 61 	Scan date: 2014-12-13 00:44:13
  |  
-[+] Querying PassiveTotal for 188.166.129.94...
+[+] Querying PassiveTotal for 93.184.216.34...
  |  
- |  Query: 188.166.129.94
- |  First Seen: 2016-01-09 02:53:45
- |  Last Seen: 2016-01-22 05:26:28
- |  Resolve Count:  5
+ |  Query: 93.184.216.34
+ |  First Seen: 2014-12-10 00:00:00
+ |  Last Seen: 2016-01-23 22:56:49
+ |  Resolve Count:  181
  |  Resolutions
- |  ==>  evil.host 	2016-01-18 12:55:19 	2016-01-22 05:26:28 	kaspersky
- |  ==>  kurittu.org 	2016-01-21 23:37:15 	2016-01-21 23:37:15 	kaspersky
- |  ==>  evil.host 	2016-01-18 12:55:19 	2016-01-21 06:08:48 	kaspersky
- |  ==>  kurittu.org 	2016-01-21 00:00:00 	2016-01-21 00:00:00 	virustotal
- |  ==>  evil.host 	2016-01-09 02:53:45 	2016-01-19 06:20:15 	riskiq, pingly, kaspersky
+ |  ==>  www.example.org 	2014-12-13 07:46:29 	2016-01-23 22:56:49 	kaspersky
+ |  ==>  www.example.com 	2014-12-10 16:34:18 	2016-01-23 21:58:43 	kaspersky
+ |  ==>  example.com 	2014-12-10 07:09:38 	2016-01-23 15:59:25 	kaspersky
+ |  ==>  example.org 	2014-12-10 09:28:54 	2016-01-23 05:02:01 	kaspersky
+ |  ==>  example.com 	2014-12-10 00:31:47 	2016-01-11 02:36:36 	riskiq
+ |  ==>  www.example.org 	2014-12-10 00:29:26 	2016-01-11 02:19:31 	riskiq
+ |  ==>  www.example.com 	2014-12-10 00:19:18 	2016-01-11 02:10:30 	riskiq
+ |  ==>  example.net 	2014-12-10 00:51:46 	2016-01-10 23:17:55 	riskiq
+ |  ==>  example.edu 	2015-05-08 18:42:02 	2016-01-10 22:50:54 	riskiq
+ |  ==>  www.example.edu 	2015-05-11 21:47:56 	2016-01-10 22:41:22 	riskiq
+ |  ==>  example.org 	2014-12-10 00:29:48 	2016-01-10 22:01:22 	riskiq
+ |  ==>  www.example.net 	2014-12-10 01:29:12 	2016-01-10 21:07:07 	riskiq
+ |  ==>  medigym.com 	2015-07-08 22:02:23 	2016-01-09 17:51:28 	riskiq
+ |  ==>  alertmyarea.com 	2016-01-05 16:00:47 	2016-01-09 07:22:44 	riskiq
+ |  ==>  cnwjaco.com 	2016-01-08 23:02:24 	2016-01-08 23:02:24 	kaspersky
+ |  ==>  cnwjaco.eu 	2016-01-08 22:37:33 	2016-01-08 22:37:33 	kaspersky
+ |  ==>  cnwjaco.de 	2016-01-08 22:35:30 	2016-01-08 22:35:30 	kaspersky
+ |  ==>  csgosnack.net 	2016-01-08 00:00:00 	2016-01-08 00:00:00 	virustotal
+ |  ==>  sakutraplin.com 	2016-01-07 11:16:52 	2016-01-07 22:57:09 	riskiq
+ |  ==>  cnwjaco.com 	2016-01-07 10:57:37 	2016-01-07 10:57:37 	riskiq
+ |  ==>  winter-weht.net 	2015-06-10 16:39:29 	2016-01-07 04:22:57 	riskiq
+ |  ==>  csgosnack.org 	2016-01-07 00:00:00 	2016-01-07 00:00:00 	virustotal
+ |  ==>  krokerspinaz.com 	2016-01-06 11:22:27 	2016-01-06 11:22:27 	riskiq
+ |  ==>  cnwjaco.de 	2016-01-06 00:00:00 	2016-01-06 00:00:00 	virustotal
+ |  ==>  cnwjaco.eu 	2016-01-06 00:00:00 	2016-01-06 00:00:00 	virustotal
+ |  ==>  cnwjaco.com 	2016-01-06 00:00:00 	2016-01-06 00:00:00 	virustotal
+ |  ==>  alertmyarea.com 	2016-01-04 17:15:35 	2016-01-04 17:15:35 	kaspersky
+ |  ==>  sakutraplin.com 	2016-01-04 15:28:07 	2016-01-04 15:28:07 	kaspersky
+ |  ==>  krokerspinaz.com 	2016-01-04 14:08:27 	2016-01-04 14:08:27 	kaspersky
+ |  ==>  alertmyarea.com 	2016-01-04 00:00:00 	2016-01-04 00:00:00 	virustotal
+ |  ==>  krokerspinaz.com 	2016-01-04 00:00:00 	2016-01-04 00:00:00 	virustotal
+ |  ==>  sakutraplin.com 	2016-01-04 00:00:00 	2016-01-04 00:00:00 	virustotal
+ |  ==>  iquyxa.ovh 	2015-12-25 00:00:00 	2015-12-30 18:40:12 	riskiq, virustotal, kaspersky
+ |  ==>  www.example.net 	2015-01-23 15:13:00 	2015-12-24 17:40:29 	kaspersky
+ |  ==>  zgfs58.com 	2015-12-24 11:51:51 	2015-12-24 11:51:51 	kaspersky
+ |  ==>  heavenjob.com 	2015-04-06 16:37:26 	2015-12-24 00:39:58 	riskiq
+ |  ==>  uicbe.com 	2015-12-19 15:57:53 	2015-12-19 15:57:53 	kaspersky
+ |  ==>  medigymgmbh.de 	2015-07-28 22:32:23 	2015-12-18 10:07:12 	riskiq
+ |  ==>  example.com 	2015-12-17 11:20:50 	2015-12-17 11:20:50 	pingly
+ |  ==>  www.ghanandwom.com 	2015-12-16 10:55:10 	2015-12-16 11:26:25 	riskiq
+ |  ==>  www.example.edu 	2015-10-23 14:20:06 	2015-12-15 18:03:02 	kaspersky
+ |  ==>  example.com 	2015-12-15 09:45:59 	2015-12-15 10:45:45 	pingly
+ |  ==>  www.example.com 	2014-12-10 00:19:18 	2015-12-15 05:22:57 	riskiq
+ |  ==>  example.org 	2014-12-10 00:29:48 	2015-12-15 03:40:02 	riskiq
+ |  ==>  www.example.net 	2014-12-10 01:29:12 	2015-12-15 02:58:36 	riskiq
+ |  ==>  example.com 	2014-12-10 00:31:47 	2015-12-15 02:54:12 	riskiq
+ |  ==>  example.net 	2014-12-10 00:51:46 	2015-12-14 20:19:23 	riskiq
+ |  ==>  www.example.com 	2014-12-10 16:34:18 	2015-12-14 15:37:09 	kaspersky
+ |  ==>  www.example.org 	2014-12-10 00:29:26 	2015-12-14 11:34:15 	riskiq
+ |  ==>  example.com 	2014-12-10 07:09:38 	2015-12-14 08:21:46 	kaspersky
+ |  ==>  example.org 	2014-12-10 09:28:54 	2015-12-14 04:43:31 	kaspersky
+ |  ==>  www.example.edu 	2015-10-23 14:20:06 	2015-12-13 12:54:50 	kaspersky
+ |  ==>  scoutingpius12.com 	2015-02-05 23:58:13 	2015-12-13 01:10:23 	kaspersky
+ |  ==>  93.184.216.34.beesdom.com 	2015-06-29 22:21:11 	2015-12-12 14:04:13 	riskiq
+ |  ==>  www.example.org 	2014-12-13 07:46:29 	2015-12-11 10:50:43 	kaspersky
+ |  ==>  rojnews.net 	2015-12-07 14:15:54 	2015-12-07 15:14:01 	riskiq
+ |  ==>  example.edu 	2015-06-26 00:02:54 	2015-12-07 06:57:50 	riskiq
+ |  ==>  medigym.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  medigymgmbh.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  medigym-international.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  medigym.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  medigym-international.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  medigymgmbh.com 	2015-12-05 00:12:20 	2015-12-05 00:12:20 	kaspersky
+ |  ==>  example.com 	2015-11-30 11:53:53 	2015-12-01 09:45:24 	pingly
+ |  ==>  heavenjob.com 	2015-10-31 09:15:38 	2015-11-27 08:27:58 	kaspersky
+ |  ==>  tangerca-bro.foxycart.com 	2015-11-26 22:44:46 	2015-11-27 02:12:07 	riskiq
+ |  ==>  tangerca-sts.foxycart.com 	2015-11-26 22:43:47 	2015-11-27 02:12:07 	riskiq
+ |  ==>  tangerca-bro.foxycart.com 	2015-11-26 22:44:46 	2015-11-27 02:12:07 	riskiq
+ |  ==>  tangerca-sts.foxycart.com 	2015-11-26 22:43:47 	2015-11-27 02:12:07 	riskiq
+ |  ==>  tangerca-ott.foxycart.com 	2015-11-26 22:43:41 	2015-11-27 02:12:00 	riskiq
+ |  ==>  tangerca.foxycart.com 	2015-11-26 22:43:37 	2015-11-27 00:55:32 	riskiq
+ |  ==>  tanger.foxycart.com 	2015-11-26 22:44:59 	2015-11-27 00:55:32 	riskiq
+ |  ==>  medigym.com 	2015-07-23 09:34:19 	2015-11-22 20:18:05 	riskiq
+ |  ==>  medigymgmbh.de 	2015-11-21 00:00:00 	2015-11-21 08:23:52 	virustotal, kaspersky
+ |  ==>  example.com 	2015-11-19 13:05:24 	2015-11-19 13:05:24 	pingly
+ |  ==>  www.example.edu 	2015-07-18 22:48:54 	2015-11-19 11:10:00 	riskiq
+ |  ==>  www.example.net 	2015-01-23 15:13:00 	2015-11-16 15:47:11 	kaspersky
+ |  ==>  example.com 	2015-11-16 11:47:44 	2015-11-16 11:52:43 	pingly
+ |  ==>  dns2.yy0662.com 	2015-11-08 03:57:20 	2015-11-15 00:11:05 	riskiq
+ |  ==>  dns1.yy0662.com 	2015-11-08 03:57:20 	2015-11-15 00:11:05 	riskiq
+ |  ==>  dns2.yy0662.com 	2015-11-08 03:57:20 	2015-11-15 00:11:05 	riskiq
+ |  ==>  dns1.yy0662.com 	2015-11-08 03:57:20 	2015-11-15 00:11:05 	riskiq
+ |  ==>  beesdom.com 	2015-10-18 01:39:39 	2015-11-14 08:19:58 	kaspersky
+ |  ==>  www.ecosdanoticia.com.br 	2015-11-13 00:00:00 	2015-11-13 00:00:00 	virustotal
+ |  ==>  delivered.me 	2015-11-10 00:00:00 	2015-11-10 21:07:27 	virustotal, kaspersky
+ |  ==>  example.net 	2014-12-31 23:53:52 	2015-11-09 16:27:19 	kaspersky
+ |  ==>  example.com 	2015-10-28 10:43:59 	2015-11-02 18:01:50 	pingly
+ |  ==>  chadisu.de 	2015-10-27 04:56:26 	2015-10-27 04:56:26 	riskiq
+ |  ==>  www.lenandlisamills.com 	2015-10-25 19:04:17 	2015-10-25 22:09:35 	kaspersky
+ |  ==>  medigym-international.com 	2015-07-11 03:56:14 	2015-10-24 07:39:52 	riskiq
+ |  ==>  www.medigym.com 	2015-10-21 23:47:18 	2015-10-21 23:47:18 	riskiq
+ |  ==>  hustlermoneyblog.com 	2015-10-20 18:12:15 	2015-10-20 20:26:56 	riskiq
+ |  ==>  forum.bernhard-holzmann.net 	2015-10-13 14:15:34 	2015-10-13 14:15:34 	riskiq
+ |  ==>  bernhard-holzmann.net 	2015-10-13 14:15:33 	2015-10-13 14:15:33 	riskiq
+ |  ==>  medigym-international.com 	2015-07-11 03:56:14 	2015-10-12 11:16:31 	riskiq
+ |  ==>  example.edu 	2015-06-11 15:36:52 	2015-10-08 20:07:21 	kaspersky
+ |  ==>  example.com 	2015-10-08 07:00:38 	2015-10-08 07:00:38 	pingly
+ |  ==>  delivered.me 	2015-05-03 08:15:02 	2015-10-07 18:04:10 	riskiq
+ |  ==>  www.example.com 	2015-09-23 20:08:55 	2015-09-23 20:08:55 	pingly
+ |  ==>  projectcredits.ca 	2015-09-23 00:00:00 	2015-09-23 00:00:00 	virustotal
+ |  ==>  winter-weht.net 	2015-09-19 19:28:24 	2015-09-19 19:28:24 	riskiq
+ |  ==>  promociq.com 	2015-06-10 01:21:07 	2015-09-15 17:37:40 	riskiq
+ |  ==>  imrek.org 	2015-09-08 00:00:00 	2015-09-08 00:00:00 	virustotal
+ |  ==>  jxqy589.com 	2015-09-05 00:00:00 	2015-09-05 01:08:47 	virustotal, kaspersky
+ |  ==>  heavenjob.com 	2015-07-19 17:28:29 	2015-09-03 20:30:27 	riskiq
+ |  ==>  medigymgmbh.com 	2015-08-26 09:04:16 	2015-08-30 10:19:45 	riskiq
+ |  ==>  mail.medigym.com 	2015-08-28 12:21:37 	2015-08-28 23:21:06 	riskiq
+ |  ==>  beesdom.com 	2015-03-11 19:10:54 	2015-08-28 10:06:40 	riskiq
+ |  ==>  example.com 	2015-08-22 18:03:58 	2015-08-22 18:03:58 	pingly
+ |  ==>  1443.z.xlocal.org 	2015-07-29 06:32:03 	2015-08-10 17:30:40 	riskiq
+ |  ==>  microservices.com 	2015-06-27 02:35:45 	2015-07-31 18:34:49 	riskiq
+ |  ==>  www.example.com 	2014-12-10 16:34:18 	2015-07-30 15:50:40 	pingly, kaspersky
+ |  ==>  example.com 	2014-12-10 07:09:38 	2015-07-29 07:49:18 	kaspersky
+ |  ==>  example.org 	2014-12-10 09:28:54 	2015-07-29 03:59:44 	kaspersky
+ |  ==>  medigymgmbh.de 	2015-07-28 22:32:23 	2015-07-28 22:32:23 	riskiq
+ |  ==>  www.example.net 	2015-01-23 15:13:00 	2015-07-24 11:00:02 	kaspersky
+ |  ==>  ftp.promociq.com 	2015-07-23 22:27:02 	2015-07-23 22:27:02 	riskiq
+ |  ==>  www.example.org 	2014-12-13 07:46:29 	2015-07-15 22:57:37 	kaspersky
+ |  ==>  example.net 	2014-12-31 23:53:52 	2015-07-15 14:52:00 	kaspersky
+ |  ==>  10000good.com 	2015-03-01 14:21:49 	2015-07-07 15:13:21 	riskiq
+ |  ==>  www.medigym.com 	2015-07-01 00:00:00 	2015-07-01 00:00:00 	virustotal
+ |  ==>  jamesbillingham.co.uk 	2015-06-23 15:32:41 	2015-06-29 08:39:19 	riskiq
+ |  ==>  52youlian.pub 	2015-06-25 08:39:20 	2015-06-25 08:39:20 	pingly
+ |  ==>  www.example.com 	2014-12-10 16:34:18 	2015-06-24 23:55:22 	kaspersky
+ |  ==>  www.example.net 	2015-01-23 15:13:00 	2015-06-24 14:47:42 	kaspersky
+ |  ==>  example.org 	2014-12-10 09:28:54 	2015-06-24 05:29:05 	kaspersky
+ |  ==>  example.com 	2014-12-10 07:09:38 	2015-06-24 04:36:19 	kaspersky
+ |  ==>  example.org 	2015-06-22 09:21:22 	2015-06-22 09:21:22 	pingly
+ |  ==>  crossgov.uk 	2015-06-21 23:46:34 	2015-06-21 23:46:34 	riskiq
+ |  ==>  example.org 	2015-06-21 17:36:20 	2015-06-21 17:43:25 	pingly
+ |  ==>  52youlian.pub 	2015-06-14 00:00:00 	2015-06-14 00:00:00 	virustotal
+ |  ==>  93.184.216.34 	2015-06-06 16:45:00 	2015-06-13 22:36:00 	kaspersky
+ |  ==>  example.edu 	2015-06-11 15:36:52 	2015-06-11 15:36:52 	kaspersky
+ |  ==>  example.net 	2014-12-31 23:53:52 	2015-06-11 15:36:51 	kaspersky
+ |  ==>  imrek.org 	2015-06-11 01:44:54 	2015-06-11 01:44:54 	riskiq
+ |  ==>  scoutingpius12.com 	2015-06-06 12:53:46 	2015-06-07 16:55:29 	riskiq
+ |  ==>  stgbg.com 	2015-06-07 05:24:55 	2015-06-07 05:24:55 	riskiq
+ |  ==>  pixelrunners.com 	2015-05-19 00:31:15 	2015-06-03 13:04:41 	riskiq
+ |  ==>  chadisu.com 	2015-05-30 02:19:32 	2015-05-30 02:19:32 	riskiq
+ |  ==>  www.example.org 	2014-12-13 07:46:29 	2015-05-24 06:51:20 	kaspersky
+ |  ==>  burstfiregame.com 	2015-04-30 04:20:54 	2015-05-03 00:00:00 	riskiq, virustotal
+ |  ==>  t.delivr.com 	2015-04-06 00:00:00 	2015-04-06 00:00:00 	virustotal
+ |  ==>  winter-weht.net 	2015-03-17 05:38:18 	2015-03-17 05:38:18 	kaspersky
+ |  ==>  projectcredits.ca 	2015-02-14 07:02:39 	2015-03-16 05:00:49 	riskiq
+ |  ==>  www.example.net 	2015-03-09 00:00:00 	2015-03-09 00:00:00 	virustotal
+ |  ==>  www.easycounter.com 	2015-02-24 19:19:00 	2015-02-27 09:20:00 	virustotal, kaspersky
+ |  ==>  scoutingpius12.com 	2015-02-05 23:58:13 	2015-02-05 23:58:13 	kaspersky
+ |  ==>  example.net 	2014-12-31 00:00:00 	2014-12-31 00:00:00 	virustotal
+ |  ==>  user@example.com 	2014-12-17 20:45:38 	2014-12-17 20:45:38 	kaspersky
+ |  ==>  userexample.com 	2014-12-17 20:45:38 	2014-12-17 20:45:38 	kaspersky
+ |  ==>  user@example.com 	2014-12-17 20:45:38 	2014-12-17 20:45:38 	kaspersky
+ |  ==>  userexample.com 	2014-12-17 20:45:38 	2014-12-17 20:45:38 	kaspersky
+ |  ==>  user@example.com 	2014-12-17 20:45:38 	2014-12-17 20:45:38 	kaspersky
+ |  ==>  www.example 	2014-12-11 21:39:00 	2014-12-11 21:39:00 	kaspersky
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.org 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
+ |  ==>  www.example.com 	2014-12-10 00:00:00 	2014-12-10 00:00:00 	virustotal
  |  
 [+] Scanning common ports...
  |  
@@ -264,7 +610,6 @@
  |  Scanning port 23...
  |  Scanning port 25...
  |  Scanning port 53...
- |  port 53 is open.
  |  Scanning port 80...
  |  port 80 is open.
  |  Scanning port 8000...
