@@ -231,6 +231,10 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
     '302': clr.G + 'Neutral: Alternative or controversial medicine' + clr.END,
     '303': clr.G + 'Neutral: Opinions, religion, politics ' + clr.END,
     '304': clr.G + 'Neutral: Other ' + clr.END,
+    '401': clr.Y + 'Child safety: Adult content' + clr.END,
+    '402': clr.Y + 'Child safety: Incindental nudity' + clr.END,
+    '403': clr.R + 'Child safety: Gruesome or shocking' + clr.END,
+    '404': clr.G + 'Child safety: Site for kids' + clr.END,
     '501': clr.G + 'Positive: Good site' + clr.END}
     if reply.status_code == 200:
         hasKeys = False
