@@ -91,6 +91,8 @@ sourceListSpamDNS = ["zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org", "vi
 "dnsbl-1.uceprotect.net", "dnsbl-2.uceprotect.net", "dnsbl-3.uceprotect.net", "db.wpbl.info"] # What sources to query for malwarelists
 logfile = "" # Set variable as blank to avoid errors further on.
 runerrors = False
+notRun = [] # Gather skipped modules
+Run = [] # Gather executed modules
 
 try:
     VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
@@ -144,10 +146,6 @@ else:
   runerrors = True
   exit()
 
-targetIPrange = targetIPaddress.split(".") # Split to get a range for rangematches in blacklists
-targetIPrange = targetIPrange[0] + "." + targetIPrange[1] + "." + targetIPrange[2] + ".0"
-print clr.HDR + gfx.STAR + "Using IP address " + targetIPaddress + clr.END
-
 if not cliArg.nolog:
   if cliArg.logfile:
     logfile = cliArg.logfile
@@ -162,17 +160,28 @@ if not cliArg.nolog:
         self.log = open(filename, "w")
     def write(self, message):
         self.terminal.write(message)
-        self.log.write(message)
+        self.log.write(message.replace("\033[95m", "").replace("\033[94m", "").replace("\033[93m", "").replace("\033[92m", "").replace("\033[91m", "").replace("\033[0m", "").replace("\033[1m", "").replace("\033[4m", ""))
     def flush(self):
         self.terminal.flush()
   sys.stdout = Logger(logfile)
 
-else:
-  print clr.Y + gfx.MINUS + "Skipping log file." + clr.END
+targetIPrange = targetIPaddress.split(".") # Split to get a range for rangematches in blacklists
+targetIPrange = targetIPrange[0] + "." + targetIPrange[1] + "." + targetIPrange[2] + ".0"
+print clr.HDR + gfx.STAR + "Using IP address " + targetIPaddress + clr.END
 
+## CHECK IP TYPE
+if targetIPaddress != "127.0.0.1":
+    iptype = IP(targetIPaddress).iptype()
+else:
+    iptype="PUBLIC"
+if iptype == "PRIVATE" or iptype == "LOOPBACK":
+  print clr.R + gfx.STAR + "IP address type is \'" + iptype.lower() + "\', this may lead to errors."
+else:
+  print clr.HDR + gfx.STAR + "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + clr.END
 
 ### GOOGLE SAFE BROWSING API LOOKUP
 if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
+    Run.append("Google Safe Browsing")
     print clr.HDR + gfx.STAR + "Querying Google Safe Browsing API with domain name" + clr.END
     target = 'http://' + targetHostname + '/'
     parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
@@ -202,10 +211,11 @@ if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetHostname 
         runerrors = True
     print gfx.PIPE
 else:
-    print clr.Y + gfx.MINUS + "Skipping Google Safe Browsing API query, Enable with \"--googlesafebrowsing\" or \"-gs\"" + clr.END
+    notRun.append("Google Safe Browsing")
 
 ### WEB OF TRUST API LOOKUP
 if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
+    Run.append("Web Of Trust")
     print clr.HDR + gfx.STAR + "Querying Web Of Trust reputation API with domain name" + clr.END
     target = 'http://' + targetHostname + '/'
     parameters = {'hosts': targetHostname + "/", 'key': WOTAPIKey}
@@ -277,11 +287,12 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
     if reply.status_code != 200:
         print gfx.FAIL + clr.R + "Server returned status code %s see https://www.mywot.com/wiki/API for details." % (reply.status_code)
 else:
-    print clr.Y + gfx.MINUS + "Skipping Web Of Trust reputation API query, Enable with \"--weboftrust\" or \"-wt\"" + clr.END
+    notRun.append("Web Of Trust")
 
 
 ### MALWAREBLOCKLISTS
 if cliArg.malwarelists or cliArg.lists or cliArg.all:
+  Run.append("Malware blacklists")
   totalLines = 0
   if os.path.isfile(malwareSourceFile) == True:
       with open(malwareSourceFile) as sourcefile:
@@ -402,10 +413,11 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
   print gfx.PLUS + "A total of %s lines searched." % (totalLines) + clr.END
   print gfx.PIPE
 else:
-  print clr.Y + gfx.MINUS + "Skipping malwarelists query, Enable with \"--malwarelist\" or \"-ml\"" + clr.END
+    notRun.append("Malware blacklists")
 
 ### SPAMLISTS
 if cliArg.spamlists or cliArg.lists or cliArg.all:
+    Run.append("Spamlists")
     print clr.HDR + gfx.STAR + "Querying spamlists for %s..." % (targetIPaddress) + clr.END
     print gfx.PIPE
     for bl in sourceListSpamDNS:
@@ -419,10 +431,11 @@ if cliArg.spamlists or cliArg.lists or cliArg.all:
             print gfx.PIPE + 'IP: %s is NOT listed in %s' %(targetIPaddress, bl)
     print gfx.PIPE
 else:
-  print clr.Y + gfx.MINUS + "Skipping spam blocklists check, Enable with \"--spamlists\" or \"-sp\"" + clr.END
+    notRun.append("Spamlists")
 
 ### VIRUSTOTAL
 if (cliArg.virustotal or cliArg.lists or cliArg.all) and VirusTotalAPIKey != "":
+  Run.append("VirusTotal")
   print clr.HDR + gfx.PLUS + "Querying VirusTotal for " + targetIPaddress + "..." + clr.END
   vturl = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
   parameters = {'ip': targetIPaddress, 'apikey': VirusTotalAPIKey}
@@ -447,10 +460,11 @@ if (cliArg.virustotal or cliArg.lists or cliArg.all) and VirusTotalAPIKey != "":
             print gfx.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
         print gfx.PIPE
 else:
-  print clr.Y + gfx.MINUS + "Skipping VirusTotal passive DNS, Enable with \"--virustotal\" or \"-vt\"" + clr.END
+    notRun.append("VirusTotal")
 
 ### PASSIVETOTAL
 if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey != "":
+  Run.append("PassiveTotal")
   #disable passivetotal's error message
   requests.packages.urllib3.disable_warnings()
   #define API key
@@ -479,11 +493,12 @@ if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey !=
     print gfx.FAIL + clr.R + "%s" % (response['error']) + clr.END
   print gfx.PIPE + clr.END
 else:
-  print clr.Y + gfx.MINUS + "Skipping PassiveTotal. Enable with argument \"--passive\" or \"-p\"" + clr.END
+    notRun.append("PassiveTotal")
 
 
 ### GEOIP
 if cliArg.geoip or cliArg.lists or cliArg.all:
+    Run.append("GeoIP")
     if os.path.isfile(GeoIPDatabaseFile) == True:
         latitude = ""
         longitude = latitude
@@ -514,10 +529,11 @@ if cliArg.geoip or cliArg.lists or cliArg.all:
         print gfx.FAIL + clr.R + "Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/" + clr.END
         runerrors = True
 else:
-    print clr.Y + gfx.MINUS + "Skipping GeoIP. Enable with argument \"--geoip\" or \"-g\""
+    notRun.append("GeoIP")
 
 ### WHOIS
 if cliArg.whois or cliArg.lists or cliArg.all:
+  Run.append("Whois")
   results = results2 = ""
   try:
     results = subprocess.check_output("whois "+targetIPaddress, shell=True)
@@ -553,22 +569,11 @@ if cliArg.whois or cliArg.lists or cliArg.all:
       else:
         print gfx.PIPE + line  + clr.END
 else:
-  print clr.Y + gfx.MINUS + "Skipping Whois. Enable with argument \"--whois\" or \"-w\""
-
-
-## SEE IF IP IS LIVE
-if targetIPaddress != "127.0.0.1":
-    iptype = IP(targetIPaddress).iptype()
-else:
-    iptype="PUBLIC"
-if iptype == "PRIVATE" or iptype == "LOOPBACK":
-  print clr.R + gfx.STAR + "IP address type is \'" + iptype.lower() + "\', can not process. Exiting..."
-  exit()
-else:
-  print clr.HDR + gfx.STAR + "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + clr.END
+    notRun.append("Whois")
 
 #### PING
 if cliArg.ping or cliArg.probes or cliArg.all:
+  Run.append("Ping")
   print clr.HDR + gfx.PLUS + "Pinging target, skip with CTRL-C..." + clr.END
   print gfx.PIPE + clr.END
   try:
@@ -580,11 +585,13 @@ if cliArg.ping or cliArg.probes or cliArg.all:
     print gfx.PIPE + clr.END
   except KeyboardInterrupt:
     print clr.Y + gfx.MINUS + "Skipping ping." + clr.END
+    notRun.append("Ping")
 else:
-  print clr.Y + gfx.MINUS + "Skipping ping, Enable pinging with \"--ping\" or \"-P\"" + clr.END
+    notRun.append("Ping")
 
 ### SCANPORTS & SCANHEADERS
 if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
+    Run.append("Portscan")
     print clr.HDR + gfx.PLUS + "Scanning common ports..." + clr.END
     print gfx.PIPE + clr.END
     socket.setdefaulttimeout(1)
@@ -620,15 +627,17 @@ if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
       sys.exit()
     print gfx.PIPE + clr.END
 else:
-    print clr.Y + gfx.MINUS + "Skipping portscan. Enable scanning with argument \"--scan\" or \"-s\""
+    notRun.append("Portscan")
 if logfile != "":
+
   print clr.HDR + gfx.STAR + "Writing log file to " + logfile + clr.END
 
 stopTime = datetime.datetime.now()
 totalTime = stopTime - startTime
 
 if runerrors == True:
-    print clr.Y + gfx.STAR + "Done, with errors. Runtime %s seconds." % totalTime.seconds + clr.END
+    print clr.Y + gfx.STAR + "Executed", ", ".join(Run) + " with errors in %s seconds." % totalTime.seconds + clr.END
 else:
-    print clr.HDR + gfx.STAR + "Done, no errors. Runtime %s seconds." % totalTime.seconds + clr.END
+    print clr.HDR + gfx.STAR + "Executed", ", ".join(Run) + " in %s seconds." % totalTime.seconds + clr.END
+print clr.HDR + gfx.STAR + "Skipped:", ", ".join(notRun)
 exit()
