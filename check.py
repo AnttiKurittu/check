@@ -17,6 +17,8 @@ parser.add_argument("-ws", "--whois", help="Query WHOIS information", action="st
 parser.add_argument("-sp", "--scanports", help="Scan common ports", action="store_true")
 parser.add_argument("-gi", "--geoip", help="Query GeoIP database", action="store_true")
 parser.add_argument("-sh", "--scanheaders", help="Scan common ports and try to retrieve HTTP headers", action="store_true")
+parser.add_argument("-gs", "--googlesafebrowsing", help="Check Google Safe Browsing database", action="store_true")
+parser.add_argument("-wt", "--weboftrust", help="Query Web Of Trust database", action="store_true")
 parser.add_argument("-sl", "--spamlists", help="Check SURBL and SpamHaus blocklists for IP", action="store_true")
 parser.add_argument("-ml", "--malwarelists", help="Check malware lists for target", action="store_true")
 parser.add_argument("-pt", "--passivetotal", help="Query passive DNS records from PassiveTotal", action="store_true")
@@ -92,12 +94,22 @@ try:
     VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
 except KeyError:
     VirusTotalAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: VirusTotal API key not present. Add \"$ export VTAPIKEY=yourapikey\" to your startup script." + clr.END
+    print gfx.FAIL + clr.R + "Error: VirusTotal API key not present. Add \"$ export VTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://www.virustotal.com/en/documentation/public-api/" + clr.END
 try:
     PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
 except KeyError:
     PassiveTotalAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: PassiveTotal API key not present. Add \"$ export PTAPIKEY=yourapikey\" to your startup script." + clr.END
+    print gfx.FAIL + clr.R + "Error: PassiveTotal API key not present. Add \"$ export PTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://passivetotal.org/api/docs" + clr.END
+try:
+    GoogleAPIKey = os.environ['GAPIKEY'] ### same here.
+except KeyError:
+    GoogleAPIKey = ""
+    print gfx.FAIL + clr.R + "Error: Google API key not present. Add \"$ export GAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://developers.google.com/safe-browsing/lookup_guide" + clr.END
+try:
+    WOTAPIKey = os.environ['WOTAPIKEY'] ### same here.
+except KeyError:
+    WOTAPIKey = ""
+    print gfx.FAIL + clr.R + "Error: Web Of Trust API key not present. Add \"$ export WOTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://www.mywot.com/wiki/API" + clr.END
 
 def validate_ip(s): # Validate IP address format
     a = s.split('.')
@@ -160,6 +172,123 @@ if not cliArg.nolog:
 
 else:
   print clr.Y + gfx.MINUS + "Skipping log file." + clr.END
+
+
+### GOOGLE SAFE BROWSING API LOOKUP
+if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
+    print clr.HDR + gfx.STAR + "Querying Google Safe Browsing API with domain name" + clr.END
+    target = 'http://' + targetHostname + '/'
+    parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
+    reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters)
+
+    if reply.status_code == 200:
+        print gfx.PIPE
+        print gfx.PIPE + clr.Y + "%s: Address http://%s/ found:" % (reply.status_code, targetHostname), reply.text + clr.END
+    elif reply.status_code == 204:
+        print gfx.PIPE
+        print gfx.PIPE + clr.G + "%s: The requested URL is legitimate." % (reply.status_code) + clr.END
+    elif reply.status_code == 400:
+        print gfx.PIPE
+        print gfx.PIPE + clr.Y + "%s: Bad Request." % (reply.status_code), + clr.END
+        runerrors = True
+    elif reply.status_code == 401:
+        print gfx.PIPE
+        print gfx.PIPE + clr.R + "%s: Not Authorized" % (reply.status_code), + clr.END
+        runerrors = True
+    elif reply.status_code == 503:
+        print gfx.PIPE
+        print gfx.PIPE + clr.R + "%s: Service Unavailable" % (reply.status_code), + clr.END
+        runerrors = True
+    else:
+        print gfx.PIPE
+        print gfx.PIPE + clr.R + "%s: Unhandled reply: " % (reply.status_code), reply.text, + clr.END
+        runerrors = True
+    print gfx.PIPE
+else:
+    print clr.Y + gfx.MINUS + "Skipping Google Safe Browsing API query, Enable with \"--googlesafebrowsing\" or \"-gs\"" + clr.END
+
+### WEB OF TRUST API LOOKUP
+if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
+    print clr.HDR + gfx.STAR + "Querying Web Of Trust reputation API with domain name" + clr.END
+    target = 'http://' + targetHostname + '/'
+    parameters = {'hosts': targetHostname + "/", 'key': WOTAPIKey}
+    reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters)
+    reply_dict = json.loads(reply.text)
+    categories = {
+    '101': clr.R + 'Negative: Malware or viruses' + clr.END,
+    '102': clr.R + 'Negative: Poor customer experience' + clr.END,
+    '103': clr.R + 'Negative: Phishing' + clr.END,
+    '104': clr.R + 'Negative: Scam' + clr.END,
+    '105': clr.R + 'Negative: Potentially illegal' + clr.END,
+    '201': clr.Y + 'Questionable: Misleading claims or unethical' + clr.END,
+    '202': clr.Y + 'Questionable: Privacy risks' + clr.END,
+    '203': clr.Y + 'Questionable: Suspicious' + clr.END,
+    '204': clr.Y + 'Questionable: Hate, discrimination' + clr.END,
+    '205': clr.Y + 'Questionable: Spam' + clr.END,
+    '206': clr.Y + 'Questionable: Potentially unwanted programs' + clr.END,
+    '207': clr.Y + 'Questionable: Ads / pop-ups' + clr.END,
+    '301': clr.G + 'Neutral: Online tracking' + clr.END,
+    '302': clr.G + 'Neutral: Alternative or controversial medicine' + clr.END,
+    '303': clr.G + 'Neutral: Opinions, religion, politics ' + clr.END,
+    '304': clr.G + 'Neutral: Other ' + clr.END,
+    '501': clr.G + 'Positive: Good site' + clr.END}
+    if reply.status_code == 200:
+        hasKeys = False
+        for key, value in reply_dict[targetHostname].iteritems():
+            if key == "target":
+                print gfx.PLUS + "Server response OK, Web Of Trust Reputation Score for", clr.BOLD + value + ":" + clr.END
+                print gfx.PIPE
+            elif key == "1":
+                () # Deprecated
+            elif key == "2":
+                () # Deprecated
+            elif key == "0":
+                hasKeys = True
+                if int(value[0]) >= 0:
+                    assessment = clr.R + "Very poor" + clr.END
+                if int(value[0]) >= 20:
+                    assessment = clr.R + "Poor" + clr.END
+                if int(value[0]) >= 40:
+                    assessment = clr.Y + "Unsatisfactory" + clr.END
+                if int(value[0]) >= 60:
+                    assessment = clr.G + "Good" + clr.END
+                if int(value[0]) >= 80:
+                    assessment = clr.G + "Excellent" + clr.END
+                print gfx.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+            elif key == "4":
+                hasKeys = True
+                if int(value[0]) >= 0:
+                    assessment = clr.R + "Very poor" + clr.END
+                if int(value[0]) >= 20:
+                    assessment = clr.R + "Poor" + clr.END
+                if int(value[0]) >= 40:
+                    assessment = clr.Y + "Unsatisfactory" + clr.END
+                if int(value[0]) >= 60:
+                    assessment = clr.G + "Good" + clr.END
+                if int(value[0]) >= 80:
+                    assessment = clr.G + "Excellent" + clr.END
+                print gfx.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+            elif key == "categories":
+                print gfx.PIPE
+                hasKeys = True
+                for e,s in value.iteritems():
+                    print gfx.PIPE + "Category:\t %s \t[%s%% confidence]" % (categories[e], s)
+            elif key == "blacklists":
+                hasKeys = True
+                for e,s in value.iteritems():
+                    print gfx.PIPE + "Blacklisted:\t %s \tID: %s" % (e, s)
+            else:
+                print "Unknown key", key, " => ", value
+        print gfx.PIPE
+    if hasKeys == False:
+        print gfx.PIPE
+        print gfx.PIPE + clr.G + "Server response OK, no records for", targetHostname + clr.END
+        print gfx.PIPE
+    if reply.status_code != 200:
+        print gfx.FAIL + clr.R + "Server returned status code %s see https://www.mywot.com/wiki/API for details." % (reply.status_code)
+else:
+    print clr.Y + gfx.MINUS + "Skipping Web Of Trust reputation API query, Enable with \"--weboftrust\" or \"-wt\"" + clr.END
+
 
 ### MALWAREBLOCKLISTS
 if cliArg.malwarelists or cliArg.lists or cliArg.all:
@@ -313,11 +442,14 @@ if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey !=
   print clr.HDR + gfx.PLUS + "Querying PassiveTotal for " + targetIPaddress + "..." + clr.END
   print gfx.PIPE + clr.END
   try:
+      response = ""
       response = pt.get_passive(targetIPaddress)
   except ValueError:
       gfx.FAIL + clr.R + "Value error - no data received."
       runerrors = True
-  if response['success']:
+  if response == "":
+      gfx.FAIL + clr.R + "Empty response, maybe your over your quota?"
+  elif response['success']:
     print gfx.PIPE + "Query:", response['raw_query']
     print gfx.PIPE + "First Seen:", response['results']['first_seen']
     print gfx.PIPE + "Last Seen:", response['results']['last_seen']
@@ -327,7 +459,8 @@ if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey !=
     for resolve in response['records']:
       print gfx.PIPE + "==> ", resolve['resolve'], "\t", resolve['firstSeen'], "\t", resolve['lastSeen'], "\t", ', '.join([ str(x) for x in resolve['source'] ])
   else:
-    print clr.R + "[!] Error when getting passive for %s: %s" % (targetIPaddress, response['error']) + clr.END
+    print gfx.FAIL + clr.R + "Error when getting passive DNS data for %s:" % (targetIPaddress) + clr.END
+    print gfx.FAIL + clr.R + "%s" % (response['error']) + clr.END
   print gfx.PIPE + clr.END
 else:
   print clr.Y + gfx.MINUS + "Skipping PassiveTotal. Enable with argument \"--passive\" or \"-p\"" + clr.END
