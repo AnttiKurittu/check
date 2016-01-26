@@ -11,9 +11,9 @@ from IPy import IP
 parser = argparse.ArgumentParser(description='Get actions')
 parser.add_argument("-d", "--domain", metavar='domain name', type=str, help="Target domain name")
 parser.add_argument("-i", "--ip", metavar='IP address', type=str, help="Target IP address")
-parser.add_argument("-a", "--all", help="Run all queries", action="store_true")
-parser.add_argument("-l", "--lists", help="Run all third-party queries (malwarelists, spamlists, virustotal, passivetotal, whois, geoip)", action="store_true")
-parser.add_argument("-p", "--probes", help="Run all host-contacting probes (ping, scan ports, scan headers)", action="store_true")
+parser.add_argument("-a", "--all", help="run all queries", action="store_true")
+parser.add_argument("-l", "--lists", help="run all third-party queries (malwarelists, spamlists, virustotal, passivetotal, whois, geoip)", action="store_true")
+parser.add_argument("-p", "--probes", help="run all host-contacting probes (ping, scan ports, scan headers)", action="store_true")
 parser.add_argument("-pg", "--ping", help="Ping IP address", action="store_true")
 parser.add_argument("-ws", "--whois", help="Query WHOIS information", action="store_true")
 parser.add_argument("-sp", "--scanports", help="Scan common ports", action="store_true")
@@ -80,40 +80,62 @@ else:
       FAIL = "[!] "
       MINUS = "[-] "
 
+def terminate():
+    stopTime = datetime.datetime.now()
+    totalTime = stopTime - startTime
+    if len(hasError) > 0:
+        modHeader("Executed %s modules with errors in %s, runtime %s seconds." % (len(run), ", ".join(hasError), totalTime.seconds))
+    else:
+        modHeader("Executed %s modules in %s seconds." % (len(run), totalTime.seconds))
+    modHeader("Skipped %s modules."  % len(notRun))
+    exit()
+
+def throwError(message, module):
+    if module != "":
+        print gfx.FAIL + clr.R + ("%s: %s" % (module, message)) + clr.END
+        hasError.append(module)
+    else:
+        print gfx.FAIL + clr.R + ("%s" % message) + clr.END
+    return True
+def modHeader(message):
+    print gfx.STAR + clr.HDR + message + clr.END
+    return True
+
 ## Specify resources and API keys
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
-targetPortscan = [20, 22, 23, 25, 53, 80, 8000, 8080, 8081, 8088, 6667, 6668, 123, 156, 443, 10000] # What ports to scan
+targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53] # What ports to scan
 malwareSourceFile = "malwaresources.txt"
 #sourceListURL = ['http://www.malware-domains.com/files/domains.zip', 'http://www.malwaredomainlist.com/mdlcsv.php', 'https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist', 'https://zeustracker.abuse.ch/blocklist.php?download=ipblocklist', 'https://raw.githubusercontent.com/ktsaou/blocklist-ipsets/master/firehol_level1.netset']
 sourceListSpamDNS = ["zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org", "virbl.dnsbl.bit.nl", "dnsbl.inps.de",
 "ix.dnsbl.manitu.net", "dnsbl.sorbs.net", "bl.spamcannibal.org", "bl.spamcop.net", "xbl.spamhaus.org", "pbl.spamhaus.org",
 "dnsbl-1.uceprotect.net", "dnsbl-2.uceprotect.net", "dnsbl-3.uceprotect.net", "db.wpbl.info"] # What sources to query for malwarelists
+headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36', 'referer': 'https://www.google.com'}
+hasError = [] # Gather erring modules
 logfile = "" # Set variable as blank to avoid errors further on.
-runerrors = False
 notRun = [] # Gather skipped modules
-Run = [] # Gather executed modules
+run = [] # Gather executed modules
 
 try:
     VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
 except KeyError:
     VirusTotalAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: VirusTotal API key not present. Add \"$ export VTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://www.virustotal.com/en/documentation/public-api/" + clr.END
+    throwError("VirusTotal API key not present.", "VirusTotal")
 try:
     PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
 except KeyError:
     PassiveTotalAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: PassiveTotal API key not present. Add \"$ export PTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://passivetotal.org/api/docs" + clr.END
+    throwError("PassiveTotal API key not present.", "PassiveTotal")
 try:
     GoogleAPIKey = os.environ['GAPIKEY'] ### same here.
 except KeyError:
     GoogleAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: Google API key not present. Add \"$ export GAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://developers.google.com/safe-browsing/lookup_guide" + clr.END
+    throwError("Google API key not present.", "Google Safe Browsing")
 try:
     WOTAPIKey = os.environ['WOTAPIKEY'] ### same here.
 except KeyError:
     WOTAPIKey = ""
-    print gfx.FAIL + clr.R + "Error: Web Of Trust API key not present. Add \"$ export WOTAPIKEY=yourapikey\" to your shell startup script. Obtain API key: https://www.mywot.com/wiki/API" + clr.END
+    throwError("Web Of Trust API key not present.", "Web Of Trust")
 
 def validate_ip(s): # Validate IP address format
     try:
@@ -123,103 +145,95 @@ def validate_ip(s): # Validate IP address format
     return True
 
 if cliArg.ip and cliArg.domain:
-    print gfx.FAIL + clr.R + "Specify an IP address or domain, not both! Exiting..."
-    runerrors = True
-    exit()
+    throwError("Specify an IP address or domain, not both! Exiting...", "Dual target")
+    terminate()
 if cliArg.ip:
-  if validate_ip(cliArg.ip) == False:
-    print gfx.FAIL + clr.R + "Invalid IP address, exiting..."
-    runerrors = True
-    exit()
-  else:
-   targetIPaddress = cliArg.ip
-   targetHostname = "Not defined"
+    if validate_ip(cliArg.ip) == False:
+        throwError("Invalid IP address, exiting...", "Validate IP")
+        terminate()
+    else:
+        targetIPaddress = cliArg.ip
+        targetHostname = "Not defined"
 elif cliArg.domain:
-  targetHostname = cliArg.domain
-  try:
-    targetIPaddress = socket.gethostbyname(cliArg.domain)
-  except socket.gaierror:
-    print clr.R + clr.R + "Resolve error, assignign 127.0.0.1 as ip"
-    targetIPaddress = "127.0.0.1"
+    targetHostname = cliArg.domain
+    try:
+        targetIPaddress = socket.gethostbyname(cliArg.domain)
+    except socket.gaierror:
+        throwError("Resolve error, assignign 127.0.0.1 as ip", "Domain resolve")
+        throwError("Can not resolve IP address, assignigin 127.0.0.1...", "Domain resolve")
+        targetIPaddress = "127.0.0.1"
 else:
-  print gfx.FAIL + clr.R + "No target given, exiting..."
-  runerrors = True
-  exit()
+    throwError("No target given, exiting...", "Target")
+    terminate()
 
 if not cliArg.nolog:
-  if cliArg.logfile:
-    logfile = cliArg.logfile
-  else:
-    if cliArg.domain:
-        logfile = "log/check-" + targetHostname + "-"+ currentDateTime + ".log"
+    if cliArg.logfile:
+        logfile = cliArg.logfile
     else:
-        logfile = "log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
-  class Logger(object):
-    def __init__(self, filename = logfile):
-        self.terminal = sys.stdout
-        self.log = open(filename, "w")
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message.replace("\033[95m", "").replace("\033[94m", "").replace("\033[93m", "").replace("\033[92m", "").replace("\033[91m", "").replace("\033[0m", "").replace("\033[1m", "").replace("\033[4m", ""))
-    def flush(self):
-        self.terminal.flush()
-  sys.stdout = Logger(logfile)
+        if cliArg.domain:
+            logfile = "log/check-" + targetHostname + "-"+ currentDateTime + ".log"
+        else:
+            logfile = "log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
 
-targetIPrange = targetIPaddress.split(".") # Split to get a range for rangematches in blacklists
+        class Logger(object):
+            def __init__(self, filename = logfile):
+                self.terminal = sys.stdout
+                self.log = open(filename, "w")
+            def write(self, message):
+                self.terminal.write(message)
+                self.log.write(message.replace("\033[95m", "")\
+                .replace("\033[94m", "").replace("\033[93m", "")\
+                .replace("\033[92m", "").replace("\033[91m", "")\
+                .replace("\033[0m", "").replace("\033[1m", "")\
+                .replace("\033[4m", ""))
+            def flush(self):
+                self.terminal.flush()
+    sys.stdout = Logger(logfile)
+
+targetIPrange = targetIPaddress.split(".")
 targetIPrange = targetIPrange[0] + "." + targetIPrange[1] + "." + targetIPrange[2] + ".0"
-print clr.HDR + gfx.STAR + "Using IP address " + targetIPaddress + clr.END
+modHeader("Using IP address %s" % targetIPaddress)
 
-## CHECK IP TYPE
 if targetIPaddress != "127.0.0.1":
     iptype = IP(targetIPaddress).iptype()
 else:
     iptype="PUBLIC"
+
 if iptype == "PRIVATE" or iptype == "LOOPBACK":
-  print clr.R + gfx.STAR + "IP address type is \'" + iptype.lower() + "\', this may lead to errors."
+    print modHeader("IP address type is \'" + iptype.lower() + "\', this may lead to errors.")
 else:
-  print clr.HDR + gfx.STAR + "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + clr.END
+    "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + clr.END
 
 ### GOOGLE SAFE BROWSING API LOOKUP
 if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
-    Run.append("Google Safe Browsing")
-    print clr.HDR + gfx.STAR + "Querying Google Safe Browsing API with domain name" + clr.END
+    run.append("Google Safe Browsing")
+    modHeader("Querying Google Safe Browsing API with domain name")
     target = 'http://' + targetHostname + '/'
     parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
-    reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters)
-
+    reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters, headers=headers)
     if reply.status_code == 200:
-        print gfx.PIPE
-        print gfx.PIPE + clr.Y + "%s: Address http://%s/ found:" % (reply.status_code, targetHostname), reply.text + clr.END
+        print gfx.PIPE + clr.Y + "Status %s: Address http://%s/ found:" % (reply.status_code, targetHostname), reply.text + clr.END
     elif reply.status_code == 204:
-        print gfx.PIPE
-        print gfx.PIPE + clr.G + "%s: The requested URL is legitimate." % (reply.status_code) + clr.END
+        print gfx.PIPE + clr.G + "Status %s: The requested URL is legitimate." % (reply.status_code) + clr.END
     elif reply.status_code == 400:
-        print gfx.PIPE
-        print gfx.PIPE + clr.Y + "%s: Bad Request." % (reply.status_code), + clr.END
-        runerrors = True
+        throwError("Status %s: Bad Request." % reply.status_code, "Google Safe Browsing")
     elif reply.status_code == 401:
-        print gfx.PIPE
-        print gfx.PIPE + clr.R + "%s: Not Authorized" % (reply.status_code), + clr.END
-        runerrors = True
+        throwError("Status %s: Not Authorized" % (reply.status_code), "Google Safe Browsing")
     elif reply.status_code == 503:
-        print gfx.PIPE
-        print gfx.PIPE + clr.R + "%s: Service Unavailable" % (reply.status_code), + clr.END
-        runerrors = True
+        throwError("Status %s: Service Unavailable" % (reply.status_code), "Google Safe Browsing")
     else:
-        print gfx.PIPE
-        print gfx.PIPE + clr.R + "%s: Unhandled reply: " % (reply.status_code), reply.text, + clr.END
-        runerrors = True
+        throwError("Status %s: Unhandled reply: " % (reply.status_code), "Google Safe Browsing")
     print gfx.PIPE
 else:
     notRun.append("Google Safe Browsing")
 
 ### WEB OF TRUST API LOOKUP
 if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
-    Run.append("Web Of Trust")
-    print clr.HDR + gfx.STAR + "Querying Web Of Trust reputation API with domain name" + clr.END
+    run.append("Web Of Trust")
+    modHeader("Querying Web Of Trust reputation API with domain name")
     target = 'http://' + targetHostname + '/'
     parameters = {'hosts': targetHostname + "/", 'key': WOTAPIKey}
-    reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters)
+    reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters, headers=headers)
     reply_dict = json.loads(reply.text)
     categories = {
     '101': clr.R + 'Negative: Malware or viruses' + clr.END,
@@ -248,7 +262,6 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
         for key, value in reply_dict[targetHostname].iteritems():
             if key == "target":
                 print gfx.PLUS + "Server response OK, Web Of Trust Reputation Score for", clr.BOLD + value + ":" + clr.END
-                print gfx.PIPE
             elif key == "1":
                 () # Deprecated
             elif key == "2":
@@ -266,6 +279,7 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
                 if int(value[0]) >= 80:
                     assessment = clr.G + "Excellent" + clr.END
                 if key == "0":
+                    print gfx.PIPE
                     print gfx.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
                 elif key == "4":
                     print gfx.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
@@ -282,29 +296,28 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
             else:
                 print "Unknown key", key, " => ", value
     if hasKeys == False:
-        print gfx.PIPE + clr.G + "Server response OK, no records for", targetHostname + clr.END
+        print gfx.PIPE + clr.G + "Web Of Trust has no records for", targetHostname + clr.END
         print gfx.PIPE
     if reply.status_code != 200:
-        print gfx.FAIL + clr.R + "Server returned status code %s see https://www.mywot.com/wiki/API for details." % (reply.status_code)
+        throwError("Server returned status code %s see https://www.mywot.com/wiki/API for details." % reply.status_code, "Web Of Trust")
 else:
     notRun.append("Web Of Trust")
 
 
 ### MALWAREBLOCKLISTS
 if cliArg.malwarelists or cliArg.lists or cliArg.all:
-  Run.append("Malware blacklists")
+  run.append("Malware blacklists")
   totalLines = 0
   if os.path.isfile(malwareSourceFile) == True:
       with open(malwareSourceFile) as sourcefile:
-        sourceListLine = sourcefile.readlines()
-        sourceCount = 0
+          sourceListLine = sourcefile.readlines()
+          sourceCount = 0
       for line in sourceListLine:
           if line[:1] == "#":
               continue
           else:
               sourceCount += 1
-      print clr.HDR + gfx.STAR + "Downloading and searching malware blocklists for domain name and IP address." + clr.END
-      print gfx.PIPE
+      modHeader("Downloading and searching malware blocklists for address.")
       i = 0
       for sourceline in sourceListLine:
           sourceline = sourceline.split("|")
@@ -324,7 +337,7 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
           try:
               data = ""
               try:
-                  req = requests.get(sourceurl, stream=True)
+                  req = requests.get(sourceurl, stream=True, headers=headers)
               except requests.exceptions.ConnectionError:
                   print gfx.PIPE + "[" + clr.R + "Fail!" + clr.END + "] Unable to connect to %s" % (sourcename)
                   continue
@@ -379,37 +392,36 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
               elif "text/plain" in cType or "application/csv" in cType:
                   listfile = data
               else:
-                  print gfx.FAIL + clr.R + "Unknown content type:", cType, ". Treating as plaintext."
-                  runerrors = True
+                  throwError("Unknown content type:", cType, ". Treating as plaintext.", "Malwarelist")
                   listfile = data
               for line in listfile.splitlines():
                   linecount += 1
               print "\r\n" + gfx.PIPE + "Searching from %s lines." % (linecount) + clr.END
               totalLines = totalLines + linecount
               for line in listfile.splitlines():
-                if targetHostname in line:
-                  domainmatch = True
-                  print gfx.PIPE + clr.Y + "Domain match! " + clr.END + line.replace(targetHostname, clr.R + targetHostname + clr.END)
-                if targetIPaddress in line:
-                  ipmatch = True
-                  print gfx.PIPE + clr.Y + "IP match! " + clr.END + line.replace(targetHostname, clr.R + targetIPaddress + clr.END)
-                if targetIPrange in line:
-                  ipmatch = True
-                  print gfx.PIPE + clr.Y + "Range match! " + clr.END + line.replace(targetHostname, clr.R + targetIPrange + clr.END)
-              if domainmatch == False and ipmatch == True:
-                print gfx.PIPE + "Domain name not found." + clr.END
+                  if targetHostname != "Not defined":
+                      if targetHostname in line:
+                          domainmatch = True
+                          print gfx.PIPE + clr.Y + "Domain match! " + clr.END + line.replace(targetHostname, clr.R + targetHostname + clr.END)
+                  if targetIPaddress in line:
+                      ipmatch = True
+                      print gfx.PIPE + clr.Y + "IP match! " + clr.END + line.replace(targetHostname, clr.R + targetIPaddress + clr.END)
+                  if targetIPrange in line:
+                      ipmatch = True
+                      print gfx.PIPE + clr.Y + "Range match! " + clr.END + line.replace(targetHostname, clr.R + targetIPrange + clr.END)
+              if domainmatch == False and ipmatch == True and targetHostname != "Not defined":
+                  print gfx.PIPE + "Domain name not found." + clr.END
               elif ipmatch == False and domainmatch == True:
-                print gfx.PIPE + "IP address not found." + clr.END
+                  print gfx.PIPE + "IP address not found." + clr.END
               else:
-                print gfx.PIPE + "Domain name or IP address "+ clr.G + "not found" + clr.END + " in list." + clr.END
+                  print gfx.PIPE + "Address "+ clr.G + "not found" + clr.END + " in list." + clr.END
 
           except Exception:
-              print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
+              throwError("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "Malwarelist")
               runerrors = True
   else:
-    print gfx.FAIL + clr.R + "No malwarelist file found at %s" & (malwareSourceFile)
+    throwError("No malwarelist file found at %s" % malwareSourceFile, "Malwarelist")
     runerrors = True
-  print gfx.PIPE
   print gfx.PLUS + "A total of %s lines searched." % (totalLines) + clr.END
   print gfx.PIPE
 else:
@@ -417,9 +429,8 @@ else:
 
 ### SPAMLISTS
 if cliArg.spamlists or cliArg.lists or cliArg.all:
-    Run.append("Spamlists")
-    print clr.HDR + gfx.STAR + "Querying spamlists for %s..." % (targetIPaddress) + clr.END
-    print gfx.PIPE
+    run.append("Spamlists")
+    modHeader("Querying spamlists for %s..." % targetIPaddress)
     for bl in sourceListSpamDNS:
         try:
             my_resolver = dns.resolver.Resolver()
@@ -435,17 +446,16 @@ else:
 
 ### VIRUSTOTAL
 if (cliArg.virustotal or cliArg.lists or cliArg.all) and VirusTotalAPIKey != "":
-  Run.append("VirusTotal")
-  print clr.HDR + gfx.PLUS + "Querying VirusTotal for " + targetIPaddress + "..." + clr.END
+  run.append("VirusTotal")
+  modHeader("Querying VirusTotal for %s..." % targetIPaddress)
   vturl = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
   parameters = {'ip': targetIPaddress, 'apikey': VirusTotalAPIKey}
   vtresponse = urllib.urlopen('%s?%s' % (vturl, urllib.urlencode(parameters))).read()
   vtresponse_dict = json.loads(vtresponse)
   if vtresponse_dict['response_code'] == 0:
-    print clr.Y + gfx.STAR + "VirusTotal response: IP address not in dataset." + clr.END
+    print gfx.STAR + clr.Y + "VirusTotal response: IP address not in dataset." + clr.END
   else:
-    print clr.G + gfx.PLUS + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + clr.END
-    print gfx.PIPE
+    print gfx.PLUS + clr.G + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + clr.END
     for entry in vtresponse_dict['resolutions']:
       print gfx.PIPE + " =>", entry['hostname'], "Last resolved:", entry['last_resolved']
     print gfx.PIPE
@@ -464,19 +474,17 @@ else:
 
 ### PASSIVETOTAL
 if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey != "":
-  Run.append("PassiveTotal")
+  run.append("PassiveTotal")
   #disable passivetotal's error message
   requests.packages.urllib3.disable_warnings()
   #define API key
   pt = PassiveTotal(PassiveTotalAPIKey)
-  print clr.HDR + gfx.PLUS + "Querying PassiveTotal for " + targetIPaddress + "..." + clr.END
-  print gfx.PIPE + clr.END
+  modHeader("Querying PassiveTotal for %s..." % targetIPaddress)
   try:
       response = ""
       response = pt.get_passive(targetIPaddress)
   except ValueError:
-      gfx.FAIL + clr.R + "Value error - no data received."
-      runerrors = True
+      throwError("Value error - no data received.", "PassiveTotal")
   if response == "":
       gfx.FAIL + clr.R + "Empty response, maybe your over your quota?"
   elif response['success']:
@@ -489,27 +497,25 @@ if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey !=
     for resolve in response['records']:
       print gfx.PIPE + "==> ", resolve['resolve'], "\t", resolve['firstSeen'], "\t", resolve['lastSeen'], "\t", ', '.join([ str(x) for x in resolve['source'] ])
   else:
-    print gfx.FAIL + clr.R + "Error when getting passive DNS data for %s:" % (targetIPaddress) + clr.END
-    print gfx.FAIL + clr.R + "%s" % (response['error']) + clr.END
-  print gfx.PIPE + clr.END
+    throwError("%s" % response['error'], "PassiveTotal")
+  print gfx.PIPE
 else:
     notRun.append("PassiveTotal")
 
 
 ### GEOIP
 if cliArg.geoip or cliArg.lists or cliArg.all:
-    Run.append("GeoIP")
+    run.append("GeoIP")
     if os.path.isfile(GeoIPDatabaseFile) == True:
         latitude = ""
         longitude = latitude
         try:
             gi = GeoIP.open(GeoIPDatabaseFile, GeoIP.GEOIP_STANDARD)
             gir = gi.record_by_addr(targetIPaddress)
-            print clr.HDR + gfx.PLUS + "Querying GeoIP database for " + targetIPaddress + "..." + clr.END
+            modHeader("Querying GeoIP database for %s" % targetIPaddress)
             if gir is None:
-                print gfx.FAIL + clr.R + "No geodata found for IP address." + clr.END
+                throwError("No geodata found for IP address.", "GeoIP")
             else:
-                print gfx.PIPE + clr.END
                 for key, value in gir.iteritems():
                     if key == "latitude":
                         latitude = value
@@ -518,36 +524,32 @@ if cliArg.geoip or cliArg.lists or cliArg.all:
                     print gfx.PIPE + str(key) + ": " + str(value)
                 if latitude != "" and longitude != "":
                     print gfx.PIPE + "Google maps link for location: " + clr.UL + "https://maps.google.com/maps?q="+str(latitude)+","+str(longitude) + clr.END
-                print gfx.PIPE + clr.END
                 if cliArg.openlink:
                     webbrowser.open('https://maps.google.com/maps?q='+str(latitude)+','+str(longitude))
         except Exception:
-            print gfx.FAIL + clr.R + "Failed: ", str(sys.exc_info()[0]), str(sys.exc_info()[1])
-            runerrors = True
+            throwError("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "GeoIP")
     else:
-        print gfx.FAIL + clr.R + "Database not found at ", GeoIPDatabaseFile + clr.END
-        print gfx.FAIL + clr.R + "Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/" + clr.END
-        runerrors = True
+        throwError("Database not found at %s" % GeoIPDatabaseFile, "GeoIP")
+        throwError("Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/", "")
+    print gfx.PIPE
 else:
     notRun.append("GeoIP")
 
 ### WHOIS
 if cliArg.whois or cliArg.lists or cliArg.all:
-  Run.append("Whois")
+  run.append("Whois")
   results = results2 = ""
   try:
     results = subprocess.check_output("whois "+targetIPaddress, shell=True)
   except subprocess.CalledProcessError:
-    gfx.FAIL + clr.R + "Whois returned an error."
-    runerrors = True
+    throwError("Whois returned an error.", "Whois")
   if targetHostname != "Not defined":
     try:
       results2 = subprocess.check_output("whois "+targetHostname, shell=True)
     except subprocess.CalledProcessError:
-      gfx.FAIL + clr.R + "Whois returned an error."
-      runerrors = True
+      throwError("Whois returned an error.", "Whois")
   if results:
-    print clr.HDR + gfx.STAR + "Querying IP Address " + targetIPaddress + clr.END
+    modHeader("Querying IP Address %s" % targetIPaddress)
     for line in results.splitlines():
       if "#" in line:
         ()
@@ -568,76 +570,76 @@ if cliArg.whois or cliArg.lists or cliArg.all:
         print gfx.PIPE + clr.BOLD + clr.Y + line + clr.END
       else:
         print gfx.PIPE + line  + clr.END
+    print gfx.PIPE
 else:
     notRun.append("Whois")
 
 #### PING
 if cliArg.ping or cliArg.probes or cliArg.all:
-  Run.append("Ping")
-  print clr.HDR + gfx.PLUS + "Pinging target, skip with CTRL-C..." + clr.END
-  print gfx.PIPE + clr.END
-  try:
-    response = os.system("ping -c 1 " + targetIPaddress + " > /dev/null 2>&1")
-    if response == 0:
-      print gfx.PIPE + clr.G + targetIPaddress, 'is responding to ping.' + clr.END
-    else:
-      print gfx.PIPE + clr.R + targetIPaddress, 'is not responding to ping.' + clr.END
-    print gfx.PIPE + clr.END
-  except KeyboardInterrupt:
-    print clr.Y + gfx.MINUS + "Skipping ping." + clr.END
-    notRun.append("Ping")
+    run.append("Ping")
+    modHeader("Pinging %s, skip with CTRL-C..." % targetIPaddress)
+    try:
+        response = os.system("ping -c 1 " + targetIPaddress + " > /dev/null 2>&1")
+        if response == 0:
+            print gfx.PIPE + clr.G + targetIPaddress, 'is responding to ping.' + clr.END
+        else:
+            print gfx.PIPE + clr.R + targetIPaddress, 'is not responding to ping.' + clr.END
+            print gfx.PIPE + clr.END
+    except KeyboardInterrupt:
+        print clr.Y + gfx.MINUS + "Skipping ping." + clr.END
+        notRun.append("Ping")
+    print gfx.PIPE
 else:
     notRun.append("Ping")
 
 ### SCANPORTS & SCANHEADERS
 if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
-    Run.append("Portscan")
-    print clr.HDR + gfx.PLUS + "Scanning common ports..." + clr.END
-    print gfx.PIPE + clr.END
+    run.append("Portscan")
+    modHeader("Scanning common ports...")
     socket.setdefaulttimeout(1)
+    openports = []
     try:
-      for port in targetPortscan:
-        if cliArg.scanheaders or cliArg.probes or cliArg.all:
-            print gfx.PIPE + "Scanning port " + str(port) + " and attempting to get headers..." + clr.END
-        else:
-            print gfx.PIPE + "Scanning port " + str(port) + "..." + clr.END
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = sock.connect_ex((targetIPaddress, port))
-        if result == 0:
-          print gfx.PIPE + clr.G + "port " + str(port) + " is open." + clr.END
-          if (cliArg.scanheaders or cliArg.probes or cliArg.all) and targetHostname != "Not defined":
-            url = "http://" + targetHostname
-            try:
-              print clr.HDR + gfx.PLUS + "Trying to retrieve http://" + targetHostname + " from port " + str(port) + clr.END
-              page = urllib2.urlopen('http://' + targetHostname)
-              print clr.HDR + gfx.PLUS + "Getting headers..."+clr.END
-              for line in str(page.info()).splitlines():
-                  print clr.BOLD + gfx.PIPE + line + clr.END
-            except Exception,e:
-              print clr.R + "[!] " + str(e) + clr.END
-        sock.close()
+        for port in targetPortscan:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            result = sock.connect_ex((targetIPaddress, port))
+            if result == 0:
+                print gfx.PIPE + clr.G + "port " + str(port) + " is open." + clr.END
+                openports.append(port)
+            else:
+                print gfx.PIPE + "Port %s is closed." % port
+            sock.close()
+
+        if (cliArg.scanheaders or cliArg.probes or cliArg.all) and targetHostname != "Not defined":
+            for port in openports:
+                url = "http://" + targetHostname
+                try:
+                    if port == 443:
+                        protocol = "https://"
+                    else:
+                        protocol = "http://"
+                    print gfx.PIPE
+                    print gfx.PLUS + "Getting headers for %s%s:%s" % (protocol, targetHostname, port) + clr.END
+                    page = requests.get('%s%s:%s' % (protocol, targetHostname, port), headers=headers)
+                    print gfx.PIPE + clr.BOLD + "Server response code: %s" % page.status_code + clr.END
+                    for key, value in page.headers.items():
+                        print gfx.PIPE + clr.BOLD + "%s: %s" % (key, value) + clr.END
+                except Exception,e:
+                    throwError(str(e), "Headerscan")
+
     except KeyboardInterrupt:
-      print clr.R + gfx.STAR + "Caught Ctrl+C, interrupting..."
-      sys.exit()
+        print clr.R + gfx.STAR + "Caught Ctrl+C, interrupting..."
+        sys.terminate()
     except socket.gaierror:
-      print clr.R + gfx.STAR + "Hostname could not be resolved. Exiting..."
-      sys.exit()
+        print clr.R + gfx.STAR + "Hostname could not be resolved. Exiting..."
+        sys.terminate()
     except socket.error:
-      print clr.R + gfx.STAR + "Couldn't connect to server."
-      sys.exit()
+        print clr.R + gfx.STAR + "Couldn't connect to server."
+        sys.terminate()
     print gfx.PIPE + clr.END
 else:
     notRun.append("Portscan")
+
 if logfile != "":
+    modHeader("Writing log file to %s" % logfile)
 
-  print clr.HDR + gfx.STAR + "Writing log file to " + logfile + clr.END
-
-stopTime = datetime.datetime.now()
-totalTime = stopTime - startTime
-
-if runerrors == True:
-    print clr.Y + gfx.STAR + "Executed", ", ".join(Run) + " with errors in %s seconds." % totalTime.seconds + clr.END
-else:
-    print clr.HDR + gfx.STAR + "Executed", ", ".join(Run) + " in %s seconds." % totalTime.seconds + clr.END
-print clr.HDR + gfx.STAR + "Skipped:", ", ".join(notRun)
-exit()
+terminate()
