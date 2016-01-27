@@ -332,7 +332,6 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not 
 else:
     notRun.append("Web Of Trust")
 
-
 ### MALWAREBLOCKLISTS
 if cliArg.malwarelists or cliArg.lists or cliArg.all:
     run.append("Malware blacklists")
@@ -390,13 +389,10 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
         agediff = epochnow - epochstamp
         filehash = hashlib.md5(sourceurl.encode('utf-8')).hexdigest()
         cachepath = "cache/" + str(epochstamp) + "-" + filehash
-        print cachepath
-
         if epochstamp == 79200:
             usecache = False
         else:
             usecache = os.path.isfile(cachepath)
-
         if usecache == True:
             if agediff >= 60:
                 age = "%s%s%s minutes ago" % (c.G, (agediff / 60), c.END)
@@ -527,7 +523,6 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
 
     cachefiler.close()
     cachefilew.close()
-
     print g.PLUS + "A total of %s lines searched." % (totalLines) + c.END
     print g.PIPE
 else:
