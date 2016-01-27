@@ -141,27 +141,6 @@ logfile = "" # Set variable as blank to avoid errors further on.
 notRun = [] # Gather skipped modules
 run = [] # Gather executed modules
 
-try:
-    VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
-except KeyError:
-    VirusTotalAPIKey = ""
-    throwError("VirusTotal API key not present.", "VirusTotal")
-try:
-    PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
-except KeyError:
-    PassiveTotalAPIKey = ""
-    throwError("PassiveTotal API key not present.", "PassiveTotal")
-try:
-    GoogleAPIKey = os.environ['GAPIKEY'] ### same here.
-except KeyError:
-    GoogleAPIKey = ""
-    throwError("Google API key not present.", "Google Safe Browsing")
-try:
-    WOTAPIKey = os.environ['WOTAPIKEY'] ### same here.
-except KeyError:
-    WOTAPIKey = ""
-    throwError("Web Of Trust API key not present.", "Web Of Trust")
-
 def validate_ip(s): # Validate IP address format
     try:
         socket.inet_aton(s)
@@ -235,100 +214,109 @@ else:
 
 ### GOOGLE SAFE BROWSING API LOOKUP
 if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
-    run.append("Google Safe Browsing")
-    modHeader("Querying Google Safe Browsing API with domain name")
-    target = 'http://' + targetHostname + '/'
-    parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
-    reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters, headers=headers)
-    if reply.status_code == 200:
-        print g.PIPE + c.Y + "Status %s: Address http://%s/ found:" % (reply.status_code, targetHostname), reply.text + c.END
-    elif reply.status_code == 204:
-        print g.PIPE + c.G + "Status %s: The requested URL is legitimate." % (reply.status_code) + c.END
-    elif reply.status_code == 400:
-        throwError("Status %s: Bad Request." % reply.status_code, "Google Safe Browsing")
-    elif reply.status_code == 401:
-        throwError("Status %s: Not Authorized" % (reply.status_code), "Google Safe Browsing")
-    elif reply.status_code == 503:
-        throwError("Status %s: Service Unavailable" % (reply.status_code), "Google Safe Browsing")
-    else:
-        throwError("Status %s: Unhandled reply: " % (reply.status_code), "Google Safe Browsing")
-    print g.PIPE
+    try:
+        GoogleAPIKey = os.environ['GAPIKEY']
+        run.append("Google Safe Browsing")
+        modHeader("Querying Google Safe Browsing API with domain name")
+        target = 'http://' + targetHostname + '/'
+        parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
+        reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters, headers=headers)
+        if reply.status_code == 200:
+            print g.PIPE + c.Y + "Status %s: Address http://%s/ found:" % (reply.status_code, targetHostname), reply.text + c.END
+        elif reply.status_code == 204:
+            print g.PIPE + c.G + "Status %s: The requested URL is legitimate." % (reply.status_code) + c.END
+        elif reply.status_code == 400:
+            throwError("Status %s: Bad Request." % reply.status_code, "Google Safe Browsing")
+        elif reply.status_code == 401:
+            throwError("Status %s: Not Authorized" % (reply.status_code), "Google Safe Browsing")
+        elif reply.status_code == 503:
+            throwError("Status %s: Service Unavailable" % (reply.status_code), "Google Safe Browsing")
+        else:
+            throwError("Status %s: Unhandled reply: " % (reply.status_code), "Google Safe Browsing")
+        print g.PIPE
+    except KeyError:
+        throwError("Google API key not present.", "Google Safe Browsing")
+
 else:
     notRun.append("Google Safe Browsing")
 
 ### WEB OF TRUST API LOOKUP
 if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetHostname != "Not defined":
-    run.append("Web Of Trust")
-    modHeader("Querying Web Of Trust reputation API with domain name")
-    target = 'http://' + targetHostname + '/'
-    parameters = {'hosts': targetHostname + "/", 'key': WOTAPIKey}
-    reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters, headers=headers)
-    reply_dict = json.loads(reply.text)
-    categories = {
-    '101': c.R + 'Negative: Malware or viruses' + c.END,
-    '102': c.R + 'Negative: Poor customer experience' + c.END,
-    '103': c.R + 'Negative: Phishing' + c.END,
-    '104': c.R + 'Negative: Scam' + c.END,
-    '105': c.R + 'Negative: Potentially illegal' + c.END,
-    '201': c.Y + 'Questionable: Misleading claims or unethical' + c.END,
-    '202': c.Y + 'Questionable: Privacy risks' + c.END,
-    '203': c.Y + 'Questionable: Suspicious' + c.END,
-    '204': c.Y + 'Questionable: Hate, discrimination' + c.END,
-    '205': c.Y + 'Questionable: Spam' + c.END,
-    '206': c.Y + 'Questionable: Potentially unwanted programs' + c.END,
-    '207': c.Y + 'Questionable: Ads / pop-ups' + c.END,
-    '301': c.G + 'Neutral: Online tracking' + c.END,
-    '302': c.G + 'Neutral: Alternative or controversial medicine' + c.END,
-    '303': c.G + 'Neutral: Opinions, religion, politics ' + c.END,
-    '304': c.G + 'Neutral: Other ' + c.END,
-    '401': c.Y + 'Child safety: Adult content' + c.END,
-    '402': c.Y + 'Child safety: Incindental nudity' + c.END,
-    '403': c.R + 'Child safety: Gruesome or shocking' + c.END,
-    '404': c.G + 'Child safety: Site for kids' + c.END,
-    '501': c.G + 'Positive: Good site' + c.END}
-    if reply.status_code == 200:
-        hasKeys = False
-        for key, value in reply_dict[targetHostname].iteritems():
-            if key == "target":
-                print g.PLUS + "Server response OK, Web Of Trust Reputation Score for", c.BOLD + value + ":" + c.END
-            elif key == "1":
-                () # Deprecated
-            elif key == "2":
-                () # Deprecated
-            elif key == "0" or key == "4":
-                hasKeys = True
-                if int(value[0]) >= 0:
-                    assessment = c.R + "Very poor" + c.END
-                if int(value[0]) >= 20:
-                    assessment = c.R + "Poor" + c.END
-                if int(value[0]) >= 40:
-                    assessment = c.Y + "Unsatisfactory" + c.END
-                if int(value[0]) >= 60:
-                    assessment = c.G + "Good" + c.END
-                if int(value[0]) >= 80:
-                    assessment = c.G + "Excellent" + c.END
-                if key == "0":
+    try:
+        WOTAPIKey = os.environ['WOTAPIKEY'] ### same here.
+        run.append("Web Of Trust")
+        modHeader("Querying Web Of Trust reputation API with domain name")
+        target = 'http://' + targetHostname + '/'
+        parameters = {'hosts': targetHostname + "/", 'key': WOTAPIKey}
+        reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters, headers=headers)
+        reply_dict = json.loads(reply.text)
+        categories = {
+        '101': c.R + 'Negative: Malware or viruses' + c.END,
+        '102': c.R + 'Negative: Poor customer experience' + c.END,
+        '103': c.R + 'Negative: Phishing' + c.END,
+        '104': c.R + 'Negative: Scam' + c.END,
+        '105': c.R + 'Negative: Potentially illegal' + c.END,
+        '201': c.Y + 'Questionable: Misleading claims or unethical' + c.END,
+        '202': c.Y + 'Questionable: Privacy risks' + c.END,
+        '203': c.Y + 'Questionable: Suspicious' + c.END,
+        '204': c.Y + 'Questionable: Hate, discrimination' + c.END,
+        '205': c.Y + 'Questionable: Spam' + c.END,
+        '206': c.Y + 'Questionable: Potentially unwanted programs' + c.END,
+        '207': c.Y + 'Questionable: Ads / pop-ups' + c.END,
+        '301': c.G + 'Neutral: Online tracking' + c.END,
+        '302': c.G + 'Neutral: Alternative or controversial medicine' + c.END,
+        '303': c.G + 'Neutral: Opinions, religion, politics ' + c.END,
+        '304': c.G + 'Neutral: Other ' + c.END,
+        '401': c.Y + 'Child safety: Adult content' + c.END,
+        '402': c.Y + 'Child safety: Incindental nudity' + c.END,
+        '403': c.R + 'Child safety: Gruesome or shocking' + c.END,
+        '404': c.G + 'Child safety: Site for kids' + c.END,
+        '501': c.G + 'Positive: Good site' + c.END}
+        if reply.status_code == 200:
+            hasKeys = False
+            for key, value in reply_dict[targetHostname].iteritems():
+                if key == "target":
+                    print g.PLUS + "Server response OK, Web Of Trust Reputation Score for", c.BOLD + value + ":" + c.END
+                elif key == "1":
+                    () # Deprecated
+                elif key == "2":
+                    () # Deprecated
+                elif key == "0" or key == "4":
+                    hasKeys = True
+                    if int(value[0]) >= 0:
+                        assessment = c.R + "Very poor" + c.END
+                    if int(value[0]) >= 20:
+                        assessment = c.R + "Poor" + c.END
+                    if int(value[0]) >= 40:
+                        assessment = c.Y + "Unsatisfactory" + c.END
+                    if int(value[0]) >= 60:
+                        assessment = c.G + "Good" + c.END
+                    if int(value[0]) >= 80:
+                        assessment = c.G + "Excellent" + c.END
+                    if key == "0":
+                        print g.PIPE
+                        print g.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                    elif key == "4":
+                        print g.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                elif key == "categories":
                     print g.PIPE
-                    print g.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
-                elif key == "4":
-                    print g.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
-            elif key == "categories":
-                print g.PIPE
-                hasKeys = True
-                for e,s in value.iteritems():
-                    print g.PIPE + "Category:\t %s \t[%s%% confidence]" % (categories[e], s)
-                print g.PIPE
-            elif key == "blacklists":
-                hasKeys = True
-                for e,s in value.iteritems():
-                    print g.PIPE + "Blacklisted:\t %s \tID: %s" % (e, s)
-            else:
-                print "Unknown key", key, " => ", value
-    if hasKeys == False:
-        print g.PIPE + c.G + "Web Of Trust has no records for", targetHostname + c.END
-        print g.PIPE
-    if reply.status_code != 200:
-        throwError("Server returned status code %s see https://www.mywot.com/wiki/API for details." % reply.status_code, "Web Of Trust")
+                    hasKeys = True
+                    for e,s in value.iteritems():
+                        print g.PIPE + "Category:\t %s \t[%s%% confidence]" % (categories[e], s)
+                    print g.PIPE
+                elif key == "blacklists":
+                    hasKeys = True
+                    for e,s in value.iteritems():
+                        print g.PIPE + "Blacklisted:\t %s \tID: %s" % (e, s)
+                else:
+                    print "Unknown key", key, " => ", value
+        if hasKeys == False:
+            print g.PIPE + c.G + "Web Of Trust has no records for", targetHostname + c.END
+            print g.PIPE
+        if reply.status_code != 200:
+            throwError("Server returned status code %s see https://www.mywot.com/wiki/API for details." % reply.status_code, "Web Of Trust")
+    except KeyError:
+        throwError("Web Of Trust API key not present.", "Web Of Trust")
 else:
     notRun.append("Web Of Trust")
 
@@ -546,62 +534,74 @@ else:
     notRun.append("Spamlists")
 
 ### VIRUSTOTAL
-if (cliArg.virustotal or cliArg.lists or cliArg.all) and VirusTotalAPIKey != "":
-    run.append("VirusTotal")
-    modHeader("Querying VirusTotal for %s..." % targetIPaddress)
-    parameters = {
-        'ip': targetIPaddress,
-        'apikey': VirusTotalAPIKey
-                }
-    vtresponse = requests.get('https://www.virustotal.com/vtapi/v2/ip-address/report', params=parameters).content
-    vtresponse_dict = json.loads(vtresponse)
-    if vtresponse_dict['response_code'] == 0:
-        print g.STAR + c.Y + "VirusTotal response: IP address not in dataset." + c.END
-    else:
-        print g.PLUS + c.G + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + c.END
-        for entry in vtresponse_dict['resolutions']:
-            print g.PIPE + " =>", entry['hostname'], "Last resolved:", entry['last_resolved']
-        print g.PIPE
-    if len(vtresponse_dict['detected_urls']) >= 1:
-        print c.G + g.PLUS + "Detections in this address:" + c.END
-        print g.PIPE
-        for entry in vtresponse_dict['detected_urls']:
-            print g.PIPE + entry['url'].replace("http", "hxxp") + c.END
-            if entry['positives'] >= 1:
-                print g.PIPE + "Positives: ", c.R + str(entry['positives']) + c.END, "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
-            else:
-                print g.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
+
+if cliArg.virustotal or cliArg.lists or cliArg.all:
+    try:
+        VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
+        run.append("VirusTotal")
+        modHeader("Querying VirusTotal for %s..." % targetIPaddress)
+        parameters = {
+            'ip': targetIPaddress,
+            'apikey': VirusTotalAPIKey
+                    }
+        vtresponse = requests.get('https://www.virustotal.com/vtapi/v2/ip-address/report', params=parameters).content
+        vtresponse_dict = json.loads(vtresponse)
+        if vtresponse_dict['response_code'] == 0:
+            print g.STAR + c.Y + "VirusTotal response: IP address not in dataset." + c.END
+        else:
+            print g.PLUS + c.G + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + c.END
+            for entry in vtresponse_dict['resolutions']:
+                print g.PIPE + " =>", entry['hostname'], "Last resolved:", entry['last_resolved']
             print g.PIPE
+        if len(vtresponse_dict['detected_urls']) >= 1:
+            print c.G + g.PLUS + "Detections in this address:" + c.END
+            print g.PIPE
+            for entry in vtresponse_dict['detected_urls']:
+                print g.PIPE + entry['url'].replace("http", "hxxp") + c.END
+                if entry['positives'] >= 1:
+                    print g.PIPE + "Positives: ", c.R + str(entry['positives']) + c.END, "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
+                else:
+                    print g.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
+                print g.PIPE
+    except KeyError:
+        throwError("VirusTotal API key not present.", "VirusTotal")
+
+
 else:
     notRun.append("VirusTotal")
 
 ### PASSIVETOTAL
-if (cliArg.passivetotal or cliArg.lists or cliArg.all) and PassiveTotalAPIKey != "":
-    run.append("PassiveTotal")
-    #disable passivetotal's error message
-    requests.packages.urllib3.disable_warnings()
-    #define API key
-    pt = PassiveTotal(PassiveTotalAPIKey)
-    modHeader("Querying PassiveTotal for %s..." % targetIPaddress)
+if cliArg.passivetotal or cliArg.lists or cliArg.all:
     try:
-      response = ""
-      response = pt.get_passive(targetIPaddress)
-    except ValueError:
-      throwError("Value error - no data received.", "PassiveTotal")
-    if response == "":
-      g.FAIL + c.R + "Empty response, maybe your over your quota?"
-    elif response['success']:
-      print g.PIPE + "Query:", response['raw_query']
-      print g.PIPE + "First Seen:", response['results']['first_seen']
-      print g.PIPE + "Last Seen:", response['results']['last_seen']
-      print g.PIPE + "Resolve Count: ", response['result_count']
-      print g.PIPE + "Resolutions"
-      response = response['results']
-      for resolve in response['records']:
-          print g.PIPE + "==> ", resolve['resolve'], "\t", resolve['firstSeen'], "\t", resolve['lastSeen'], "\t", ', '.join([ str(x) for x in resolve['source'] ])
-    else:
-        throwError("%s" % response['error'], "PassiveTotal")
-    print g.PIPE
+        PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
+        run.append("PassiveTotal")
+        #disable passivetotal's error message
+        requests.packages.urllib3.disable_warnings()
+        #define API key
+        pt = PassiveTotal(PassiveTotalAPIKey)
+        modHeader("Querying PassiveTotal for %s..." % targetIPaddress)
+        try:
+            response = ""
+            response = pt.get_passive(targetIPaddress)
+        except ValueError:
+            throwError("Value error - no data received.", "PassiveTotal")
+        if response == "":
+            g.FAIL + c.R + "Empty response, maybe your over your quota?"
+        elif response['success']:
+            print g.PIPE + "Query:", response['raw_query']
+            print g.PIPE + "First Seen:", response['results']['first_seen']
+            print g.PIPE + "Last Seen:", response['results']['last_seen']
+            print g.PIPE + "Resolve Count: ", response['result_count']
+            print g.PIPE + "Resolutions"
+            response = response['results']
+            for resolve in response['records']:
+                print g.PIPE + "==> ", resolve['resolve'], "\t", resolve['firstSeen'], "\t", resolve['lastSeen'], "\t", ', '.join([ str(x) for x in resolve['source'] ])
+        else:
+            throwError("%s" % response['error'], "PassiveTotal")
+        print g.PIPE
+
+    except KeyError:
+        throwError("PassiveTotal API key not present.", "PassiveTotal")
 else:
     notRun.append("PassiveTotal")
 
