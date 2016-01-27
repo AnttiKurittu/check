@@ -21,10 +21,6 @@ http://www.dshield.org/block.txt|Dshield Block List
 http://www.dshield.org/feeds/suspiciousdomains_whitelist_approved.txt|Dshield whitelist - known good domains
 http://osint.bambenekconsulting.com/feeds/dga-feed.txt|DGA Feed
 http://cinsscore.com/list/ci-badguys.txt|The CI Army blacklist
-#
-# EmergingThreats rulesets
-http://rules.emergingthreats.net/blockrules/emerging-drop-BLOCK.rules|Emerging Threats Spamhaus DROP List rules.
 http://rules.emergingthreats.net/blockrules/compromised-ips.txt|Emerging Threats Compromised IPs
-http://rules.emergingthreats.net/blockrules/emerging-tor-BLOCK.rules|Emerging Threats TOR BLOCK ruleset
 http://rules.emergingthreats.net/blockrules/emerging-tor.rules|Emerging Threats TOR ruleset
 http://rules.emergingthreats.net/blockrules/emerging-botcc.rules|Emerging Threats Botnet Command and Control drop rules.

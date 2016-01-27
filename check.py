@@ -7,7 +7,8 @@ import datetime
 startTime = datetime.datetime.now()
 
 import os, sys, socket, urllib, urllib2, json, argparse, webbrowser, subprocess,\
-    zipfile, dns.resolver, requests, GeoIP, StringIO, operator, random
+    zipfile, dns.resolver, requests, GeoIP, StringIO, operator, random, hashlib,\
+    dateutil.parser, time
 from passivetotal import PassiveTotal
 from IPy import IP
 
@@ -109,7 +110,7 @@ def modHeader(message):
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
 targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53] # What ports to scan
-malwareSourceFile = "malwaresources.txt"
+malwareSourceFile = "blacklists.txt"
 sourceListSpamDNS = [
         "zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org",
         "virbl.dnsbl.bit.nl", "dnsbl.inps.de", "ix.dnsbl.manitu.net",
@@ -228,7 +229,7 @@ else:
     iptype="PUBLIC"
 
 if iptype == "PRIVATE" or iptype == "LOOPBACK":
-    print modHeader("IP address type is \'" + iptype.lower() + "\', this may lead to errors.")
+    modHeader("IP address type is %s this may lead to errors." % iptype.lower())
 else:
     "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + c.END
 
@@ -337,120 +338,196 @@ if cliArg.malwarelists or cliArg.lists or cliArg.all:
     run.append("Malware blacklists")
     totalLines = 0
     if os.path.isfile(malwareSourceFile) == True:
-      with open(malwareSourceFile) as sourcefile:
-          sourceListLine = sourcefile.readlines()
-          sourceCount = 0
-      for line in sourceListLine:
-          if line[:1] == "#":
-              continue
-          else:
-              sourceCount += 1
-      modHeader("Downloading and searching malware blocklists for address.")
-      i = 0
-      for sourceline in sourceListLine:
-          sourceline = sourceline.split("|")
-          sourceurl = sourceline[0].replace("\n", "").replace(" ", "")
-          if sourceurl[:1] == "#":
-              continue # Skip comment lines
-          try:
-              sourcename = sourceline[1].replace("\n", "")
-          except IndexError:
-              sourcename = sourceline[0].replace("\n", "") # If no name specified use URL.
-          i += 1
-          listfile = ""
-          linecount = 0
-          domainmatch = False
-          ipmatch = False
-          print g.PLUS + "Downloading from " + c.BOLD + sourcename + c.END + " \
-          [%s of %s sources]:" % (i, sourceCount) + c.END
-          try:
-              data = ""
-              try:
-                  req = requests.get(sourceurl, stream=True, headers=headers)
-              except requests.exceptions.ConnectionError:
-                  print g.PIPE + "[" + c.R + "Fail!" + c.END + "] Unable to connect to %s" % (sourcename)
-                  continue
-              try:
-                  cd = req.headers['Content-Disposition']
-              except Exception:
-                  cd = ""
-              filesize = req.headers.get('content-length')
-              if not filesize:
-                  # Assuming no content-length header
-                  sys.stdout.write(g.PIPE + "[" + c.G + "Done!" + c.END + "] Content-length not received. " + cd + c.END)
-                  data = req.content
-                  cType = "text/plain"
-              else:
-                  cType = req.headers.get('content-type')
-                  if not cType:
-                      cType = "text/plain"
-                  sys.stdout.write(g.PIPE + "[" + c.R + "     " + c.END + "] \
-                  Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + str(cType) + " \r" + g.PIPE + "[")
-                  part = int(filesize) / 5
-                  count = 0
-                  for chunk in req.iter_content(part):
-                      count += 1
-                      if count <= 5:
-                          if count == 1:
-                              sys.stdout.write(c.G + "D" + c.END)
-                          if count == 2:
-                              sys.stdout.write(c.G + "o" + c.END)
-                          if count == 3:
-                              sys.stdout.write(c.G + "n" + c.END)
-                          if count == 4:
-                              sys.stdout.write(c.G + "e" + c.END)
-                          if count == 5:
-                              sys.stdout.write(c.G + "!" + c.END)
-                          sys.stdout.flush()
-                      data = data + chunk
-                  while count < 5: # Fill the meter if the chunks round down.
-                      count += 1
-                      sys.stdout.write(c.G + "!" + c.END)
-                      sys.stdout.flush()
-              if "application/zip" in cType:
-                  filelist = {}
-                  zip_file_object = zipfile.ZipFile(StringIO.StringIO(data))
-                  for info in zip_file_object.infolist(): # Get zip contents and put to a list
-                      filelist[info.filename] = info.file_size # Add files to a list
-                  sortedlist = sorted(filelist.items(), key=operator.itemgetter(1)) # Sort list by value; largest file is last
-                  for key, value in sortedlist: # Iterate over list - last assigned value is the largest file
-                      largestfile = key
-                      largestsize = value
-                  sys.stdout.write("\r\n" + g.PIPE + "Decompressing and using largest file in archive: %s (%s bytes)." % (largestfile, largestsize))
-                  file = zip_file_object.open(largestfile)
-                  listfile = file.read()
-              elif "text/plain" in cType or "application/csv" in cType:
-                  listfile = data
-              else:
-                  throwError("Unknown content type:", cType, ". Treating as plaintext.", "Malwarelist")
-                  listfile = data
-              for line in listfile.splitlines():
-                  linecount += 1
-              print "\r\n" + g.PIPE + "Searching from %s lines." % (linecount) + c.END
-              totalLines = totalLines + linecount
-              for line in listfile.splitlines():
-                  if targetHostname != "Not defined":
-                      if targetHostname in line:
-                          domainmatch = True
-                          print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(targetHostname, c.R + targetHostname + c.END)
-                  if targetIPaddress in line:
-                      ipmatch = True
-                      print g.PIPE + c.Y + "IP match! " + c.END + line.replace(targetHostname, c.R + targetIPaddress + c.END)
-                  if targetIPrange in line:
-                      ipmatch = True
-                      print g.PIPE + c.Y + "Range match! " + c.END + line.replace(targetHostname, c.R + targetIPrange + c.END)
-              if domainmatch == False and ipmatch == True and targetHostname != "Not defined":
-                  print g.PIPE + "Domain name not found." + c.END
-              elif ipmatch == False and domainmatch == True:
-                  print g.PIPE + "IP address not found." + c.END
-              else:
-                  print g.PIPE + "Address "+ c.G + "not found" + c.END + " in list." + c.END
-
-          except Exception:
-              throwError("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "Malwarelist")
-              runerrors = True
+        with open(malwareSourceFile) as sourcefile:
+            sourceListLine = sourcefile.readlines()
+            sourceCount = 0
     else:
         throwError("No malwarelist file found at %s" % malwareSourceFile, "Malwarelist")
+        sourceListLine = ""
+        cachefilew = open(os.devnull, "w+")
+        cachefiler = open(os.devnull, "r+")
+
+    for line in sourceListLine:
+        if line[:1] == "#":
+            continue
+        else:
+            sourceCount += 1
+    modHeader("Downloading and searching malware blocklists for address.")
+    i = 0
+    for sourceline in sourceListLine:
+        sourceline = sourceline.split("|")
+        sourceurl = sourceline[0].replace("\n", "").replace(" ", "")
+
+        if sourceurl[:1] == "#":
+            continue # Skip comment lines
+
+        try:
+            sourcename = sourceline[1].replace("\n", "")
+        except IndexError:
+            sourcename = sourceline[0].replace("\n", "") # If no name specified use URL.
+
+        i += 1
+        listfile = ""
+        linecount = 0
+        domainmatch = False
+        ipmatch = False
+        print g.PLUS + "Downloading from " + c.BOLD + sourcename + c.END + " [%s of %s sources]:" % (i, sourceCount) + c.END
+
+        try:
+            data = ""
+            head = requests.head(sourceurl, headers=headers)
+        except Exception:
+            print g.PIPE + "[" + c.R + "Fail!" + c.END + "] Unable to connect to %s" % (sourcename)
+            continue
+
+        try:
+            timestamp = head.headers['Last-Modified']
+        except KeyError:
+            timestamp = "1970-01-02 00:00:00"
+
+        epochnow = int(time.mktime(dateutil.parser.parse(currentDateTime).timetuple()))
+        epochstamp = int(time.mktime(dateutil.parser.parse(timestamp).timetuple()))
+        agediff = epochnow - epochstamp
+        filehash = hashlib.md5(sourceurl.encode('utf-8')).hexdigest()
+        cachepath = "cache/" + str(epochstamp) + "-" + filehash
+        print cachepath
+
+        if epochstamp == 79200:
+            usecache = False
+        else:
+            usecache = os.path.isfile(cachepath)
+
+        if usecache == True:
+            if agediff >= 60:
+                age = "%s%s%s minutes ago" % (c.G, (agediff / 60), c.END)
+
+            if agediff >= 3600:
+                age = "%s%s%s hours ago" % (c.G, (agediff / 3600), c.END)
+
+            if agediff >= 86400:
+                if (agediff / 86400) >= 14:
+                    age = "%s%s%s days ago, %sstale source?%s" %(c.R, (agediff / 86400), c.END, c.R, c.END)
+                else:
+                    age = "%s%s%s days ago" % (c.Y, (agediff / 86400), c.END)
+            print g.PIPE + "[" + c.B + "Cache" + c.END + "] Using a cached copy. Source updated %s." % age
+            cachefiler = open(cachepath, "r+")
+            cachefilew = open(os.devnull, "w+")
+        else:
+            cachefilew = open(cachepath, "w+")
+            cachefiler = open(os.devnull, "r+")
+            cachefilew.truncate()
+        if usecache == True:
+            lines = cachefiler.readlines()
+            for line in lines:
+                linecount += 1
+            print  g.PIPE + "Searching from %s lines." % (linecount) + c.END
+            totalLines = totalLines + (linecount - 1)
+            req = None
+            for line in lines:
+                if targetHostname != "Not defined":
+                    if targetHostname in line:
+                        domainmatch = True
+                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(targetHostname, c.R + targetHostname + c.END).replace("\n", "")
+                if targetIPaddress in line:
+                    ipmatch = True
+                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(targetHostname, c.R + targetIPaddress + c.END).replace("\n", "")
+                if targetIPrange in line:
+                    ipmatch = True
+                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(targetHostname, c.R + targetIPrange + c.END).replace("\n", "")
+            if domainmatch == False and ipmatch == True and targetHostname != "Not defined":
+                print g.PIPE + "Domain name not found." + c.END
+            elif ipmatch == False and domainmatch == True:
+                print g.PIPE + "IP address not found." + c.END
+            else:
+                print g.PIPE + "Address "+ c.G + "not found" + c.END + " in list." + c.END
+
+        if usecache == False:
+            req = requests.get(sourceurl, stream=True, headers=headers)
+            try:
+                cd = req.headers['Content-Disposition']
+            except Exception:
+                cd = ""
+            filesize = req.headers.get('content-length')
+            if not filesize:
+                # Assuming no content-length header or content-type
+                sys.stdout.write(g.PIPE + "[" + c.G + "Done!" + c.END + "] Content-length not received. " + cd + c.END)
+                data = req.content
+                cType = "text/plain"
+            else:
+                cType = req.headers.get('content-type')
+                if not cType:
+                    cType = "text/plain"
+                sys.stdout.write(g.PIPE + "[" + c.R + "     " + c.END + "] Filesize: " + str(int(filesize) / 1024) + " kb \tContent type: " + str(cType) + " \r" + g.PIPE + "[")
+                part = int(filesize) / 5
+                count = 0
+                for chunk in req.iter_content(part):
+                    count += 1
+                    if count <= 5:
+                        if count == 1:
+                            sys.stdout.write(c.G + "D" + c.END)
+                        if count == 2:
+                            sys.stdout.write(c.G + "o" + c.END)
+                        if count == 3:
+                            sys.stdout.write(c.G + "n" + c.END)
+                        if count == 4:
+                            sys.stdout.write(c.G + "e" + c.END)
+                        if count == 5:
+                            sys.stdout.write(c.G + "!" + c.END)
+                        sys.stdout.flush()
+                    data = data + chunk
+                while count < 5: # Fill the meter if the chunks round down.
+                    count += 1
+                    sys.stdout.write(c.G + "!" + c.END)
+                    sys.stdout.flush()
+            if "application/zip" in cType:
+                filelist = {}
+                zip_file_object = zipfile.ZipFile(StringIO.StringIO(data))
+                for info in zip_file_object.infolist(): # Get zip contents and put to a list
+                    filelist[info.filename] = info.file_size # Add files to a list
+                sortedlist = sorted(filelist.items(), key=operator.itemgetter(1)) # Sort list by value; largest file is last
+                for key, value in sortedlist: # Iterate over list - last assigned value is the largest file
+                    largestfile = key
+                    largestsize = value
+                sys.stdout.write("\r\n" + g.PIPE + "Decompressing and using largest file in archive: %s (%s bytes)." % (largestfile, largestsize))
+                file = zip_file_object.open(largestfile)
+                listfile = file.read()
+            elif "text/plain" in cType or "application/csv" in cType:
+                listfile = data
+            else:
+                throwError("Unknown content type:", cType, ". Treating as plaintext.", "Malwarelist")
+                listfile = data
+            cachefilew.write("Cached copy for %s\n" % cachepath)
+            for line in listfile.splitlines():
+                cachefilew.write(line.replace("\n", ""))
+                cachefilew.write("\r\n")
+                linecount += 1
+            print "\r\n" + g.PIPE + "Searching from %s lines." % (linecount) + c.END
+            totalLines = totalLines + linecount
+            for line in listfile.splitlines():
+                if targetHostname != "Not defined":
+                    if targetHostname in line:
+                        domainmatch = True
+                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(targetHostname, c.R + targetHostname + c.END).replace("\n", "")
+                if targetIPaddress in line:
+                    ipmatch = True
+                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(targetHostname, c.R + targetIPaddress + c.END).replace("\n", "")
+                if targetIPrange in line:
+                    ipmatch = True
+                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(targetHostname, c.R + targetIPrange + c.END).replace("\n", "")
+            if domainmatch == False and ipmatch == True and targetHostname != "Not defined":
+                print g.PIPE + "Domain name not found." + c.END
+            elif ipmatch == False and domainmatch == True:
+                print g.PIPE + "IP address not found." + c.END
+            else:
+                print g.PIPE + "Address "+ c.G + "not found" + c.END + " in list." + c.END
+
+          #except Exception:
+              #throwError("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "Malwarelist")
+              #runerrors = True
+
+    cachefiler.close()
+    cachefilew.close()
+
     print g.PLUS + "A total of %s lines searched." % (totalLines) + c.END
     print g.PIPE
 else:
