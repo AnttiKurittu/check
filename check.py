@@ -51,14 +51,14 @@ if not cliArg.nosplash:
   print ""
 
 ## Specify resources and API keys
-scriptpath = os.path.dirname(sys.argv[0])
+scriptpath = os.path.dirname(sys.argv[0]) + "/"
 if scriptpath is "":
-    scriptpath = "."
+    scriptpath = "./"
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 eNow = int(time.mktime(dateutil.parser.parse(currentDateTime).timetuple()))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
 targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53] # What ports to scan
-blacklistSourceFile = scriptpath + "/blacklists.txt"
+blacklistSourceFile = scriptpath + "blacklists.txt"
 sourceListSpamDNS = [
         "zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org",
         "virbl.dnsbl.bit.nl", "dnsbl.inps.de", "ix.dnsbl.manitu.net",
@@ -150,11 +150,11 @@ def terminate(): # Graceful exit.
     exit()
 
 def trimcache(h): # Removes cache files older than h, returns removed megabyte amount.
-    filelist = [ f for f in os.listdir(scriptpath + "/cache") ]
+    filelist = [ f for f in os.listdir(scriptpath + "cache") ]
     removedSize = 0
     cacheSize = 0
     for f in filelist:
-        filesize = os.path.getsize(scriptpath + "/cache/" + f)
+        filesize = os.path.getsize(scriptpath + "cache/" + f)
         cacheSize = cacheSize + filesize
         filedate = 0
         difference = 0
@@ -164,7 +164,7 @@ def trimcache(h): # Removes cache files older than h, returns removed megabyte a
             difference = (eNow - filedate) / 8600
             if difference >= h:
                 removedSize = removedSize + filesize
-                os.remove(f)
+                os.remove(scriptpath + "cache/" + f)
     megabytesRemoved = removedSize / 1000000
     megabytesLeft = (cacheSize - removedSize) / 1000000
     return megabytesRemoved, megabytesLeft
@@ -218,9 +218,9 @@ if not cliArg.nolog:
 
     else:
         if cliArg.domain:
-            logfile = scriptpath + "/log/check-" + targetDomain + "-"+ currentDateTime + ".log"
+            logfile = scriptpath + "log/check-" + targetDomain + "-"+ currentDateTime + ".log"
         else:
-            logfile = scriptpath + "/log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
+            logfile = scriptpath + "log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
         sys.stdout = Logger(logfile)
 
 if cliArg.note:
@@ -414,7 +414,7 @@ if cliArg.blacklists or cliArg.lists or cliArg.all:
         eStamp = int(time.mktime(dateutil.parser.parse(timestamp).timetuple()))
         agediff = eNow - eStamp
         filehash = hashlib.md5(sourceurl.encode('utf-8')).hexdigest()
-        cachepath = scriptpath + "/cache/" + str(eStamp) + "-" + filehash
+        cachepath = scriptpath + "cache/" + str(eStamp) + "-" + filehash
         if eStamp == 79200:
             usecache = False
         else:
