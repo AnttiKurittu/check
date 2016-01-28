@@ -9,6 +9,7 @@ It currently does the following things (all or selectable):
 - Query and cache several domain- and IP blacklist sources for matches.<br>
 - Query PassiveDNS from PassiveTotal and VirusTotal.<br>
 - Query VirusTotal for matches coming from target address.<br>
+- Retrieve certificate information with OpenSSL<br>
 - Query WHOIS for domain name and IP address.<br>
 - Query local GeoIP database.<br>
 - Query spam blocklists for address.<br>
