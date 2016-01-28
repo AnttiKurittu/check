@@ -52,6 +52,8 @@ if not cliArg.nosplash:
 
 ## Specify resources and API keys
 scriptpath = os.path.dirname(sys.argv[0])
+if scriptpath is "":
+    scriptpath = "."
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 eNow = int(time.mktime(dateutil.parser.parse(currentDateTime).timetuple()))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
