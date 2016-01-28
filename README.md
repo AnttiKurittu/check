@@ -4,9 +4,9 @@
 
 It currently does the following things (all or selectable):
 
-- Query Google Safe Browsing API for website reputation<br>
+- Query Google Safe Browsing API for website reputation.<br>
 - Query Web Of Trust API for webiste reputation and categories.<br>
-- Query several domain- and IP blacklist sources for matches.<br>
+- Query and cache several domain- and IP blacklist sources for matches.<br>
 - Query PassiveDNS from PassiveTotal and VirusTotal.<br>
 - Query VirusTotal for matches coming from target address.<br>
 - Query WHOIS for domain name and IP address.<br>
