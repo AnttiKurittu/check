@@ -52,7 +52,7 @@ if not cliArg.nosplash:
 
 ## Specify resources and API keys
 scriptpath = os.path.dirname(sys.argv[0]) + "/"
-if scriptpath is "":
+if scriptpath is "/" or scriptpath is "":
     scriptpath = "./"
 currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 eNow = int(time.mktime(dateutil.parser.parse(currentDateTime).timetuple()))
@@ -85,7 +85,7 @@ uapool = [
          ]
 headers = {'user-agent': 'Mozilla/5.0 (Check.py extended address information lookup tool)', 'referer': 'https://www.github.com/AnttiKurittu/check'}
 hasError = [] # Gather erring modules
-logfile = "" # Set variable as blank to avoid errors further on.
+logfile = None # Set variable as blank to avoid errors further on.
 notRun = [] # Gather skipped modules
 run = [] # Gather executed modules
 
