@@ -37,28 +37,29 @@ parser.add_argument("-NL", "--nolog", help="Do not write log", action="store_tru
 parser.add_argument("-M", "--monochrome", help="Suppress colors", action="store_true")
 parser.add_argument("-NG", "--nogfx", help="Suppress line graphics", action="store_true")
 parser.add_argument("-S", "--nosplash", help="Suppress cool ASCII header graphic", action="store_true")
-cliArg = parser.parse_args()
+arg = parser.parse_args()
 
-if not cliArg.nosplash:
-  print "       .__                   __                      "
-  print "  ____ |  |__   ____   ____ |  | __    ______ ___.__."
-  print "_/ ___\|  |  \_/ __ \_/ ___\|  |/ /    \____ <   |  |"
-  print "\  \___|   Y  \  ___/\  \___|    <     |  |_> >___  |"
-  print " \___  >___|  /\___  >\___  >__|_ \ /\ |   __// ____|"
-  print "     \/     \/     \/     \/     \/ \/ |__|   \/     "
-  print ""
-  print "Simple address information aggregation tool. See -h for arguments and usage."
-  print ""
+if not arg.nosplash:
+    print "       .__                   __"
+    print "  ____ |  |__   ____   ____ |  | __    ______ ___.__."
+    print "_/ ___\|  |  \_/ __ \_/ ___\|  |/ /    \____ <   |  |"
+    print "\  \___|   Y  \  ___/\  \___|    <     |  |_> >___  |"
+    print " \___  >___|  /\___  >\___  >__|_ \ /\ |   __// ____|"
+    print "     \/     \/     \/     \/     \/ \/ |__|   \/"
+    print ""
+    print "Simple address information aggregation tool. See -h for arguments and usage."
+    print ""
+
 
 ## Specify resources and API keys
-scriptpath = os.path.dirname(sys.argv[0]) + "/"
-if scriptpath is "/" or scriptpath is "":
-    scriptpath = "./"
-currentDateTime = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
-eNow = int(time.mktime(dateutil.parser.parse(currentDateTime).timetuple()))
+ownPath = os.path.dirname(sys.argv[0]) + "/"
+if ownPath is "/" or ownPath is "":
+    ownPath = "./"
+curDate = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
+eNow = int(time.mktime(dateutil.parser.parse(curDate).timetuple()))
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat" # Specify database file location
 targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53] # What ports to scan
-blacklistSourceFile = scriptpath + "blacklists.txt"
+blacklistSourceFile = ownPath + "blacklists.txt"
 sourceListSpamDNS = [
         "zen.spamhaus.org", "spam.abuse.ch", "cbl.abuseat.org",
         "virbl.dnsbl.bit.nl", "dnsbl.inps.de", "ix.dnsbl.manitu.net",
@@ -89,7 +90,7 @@ logfile = None # Set variable as blank to avoid errors further on.
 notRun = [] # Gather skipped modules
 run = [] # Gather executed modules
 
-if cliArg.monochrome:
+if arg.monochrome:
   class c:
       HDR = ''
       B = ''
@@ -110,7 +111,7 @@ else:
       BOLD = '\033[1m'
       UL = '\033[4m'
 
-if cliArg.nogfx:
+if arg.nogfx:
   class g:
       STAR = ''
       PLUS = ''
@@ -150,11 +151,11 @@ def terminate(): # Graceful exit.
     exit()
 
 def trimcache(h): # Removes cache files older than h, returns removed megabyte amount.
-    filelist = [ f for f in os.listdir(scriptpath + "cache") ]
+    filelist = [ f for f in os.listdir(ownPath + "cache") ]
     removedSize = 0
     cacheSize = 0
     for f in filelist:
-        filesize = os.path.getsize(scriptpath + "cache/" + f)
+        filesize = os.path.getsize(ownPath + "cache/" + f)
         cacheSize = cacheSize + filesize
         filedate = 0
         difference = 0
@@ -164,7 +165,7 @@ def trimcache(h): # Removes cache files older than h, returns removed megabyte a
             difference = (eNow - filedate) / 8600
             if difference >= h:
                 removedSize = removedSize + filesize
-                os.remove(scriptpath + "cache/" + f)
+                os.remove(ownPath + "cache/" + f)
     megabytesRemoved = removedSize / 1000000
     megabytesLeft = (cacheSize - removedSize) / 1000000
     return megabytesRemoved, megabytesLeft
@@ -189,76 +190,69 @@ def validate_ip(ip): # Validate IP address format
     return True
 
 ### PROCESS CLI ARGUMENTS
-
-if cliArg.ip and cliArg.domain:
+if arg.ip and arg.domain:
     printe("Specify an IP address or domain, not both! Exiting...", "Dual target")
     terminate()
-if cliArg.ip:
-    if validate_ip(cliArg.ip) == False:
+
+if arg.ip:
+    if validate_ip(arg.ip) == False:
         printe("Invalid IP address, exiting...", "Validate IP")
         terminate()
     else:
-        targetIPaddress = cliArg.ip
-        targetDomain = "Not defined"
-elif cliArg.domain:
-    targetDomain = cliArg.domain.replace("https://", "").replace("http://", "").replace("/", "")
+        tIP = arg.ip
+        tD = "Not defined"
+elif arg.domain:
+    tD = arg.domain.replace("https://", "").replace("http://", "").replace("/", "")
     try:
-        targetIPaddress = socket.gethostbyname(targetDomain)
+        tIP = socket.gethostbyname(tD)
     except socket.gaierror:
         printe("Resolve error, assignign 127.0.0.1 as ip", "Domain resolve")
         printe("Can not resolve IP address, assignigin 127.0.0.1...", "Domain resolve")
-        targetIPaddress = "127.0.0.1"
+        tIP = "127.0.0.1"
 else:
     printe("No target given, exiting...", "Target")
     terminate()
-
-if not cliArg.nolog:
-    if cliArg.logfile:
-        logfile = cliArg.logfile
-
+if not arg.nolog:
+    if arg.logfile:
+        logfile = arg.logfile
     else:
-        if cliArg.domain:
-            logfile = scriptpath + "log/check-" + targetDomain + "-"+ currentDateTime + ".log"
+        if arg.domain:
+            logfile = ownPath + "log/check-" + tD + "-"+ curDate + ".log"
         else:
-            logfile = scriptpath + "log/check-" + targetIPaddress + "-"+ currentDateTime + ".log"
+            logfile = ownPath + "log/check-" + tIP + "-"+ curDate + ".log"
         sys.stdout = Logger(logfile)
 
-if cliArg.note:
-    print g.PLUS + c.BOLD + "Note: %s" % cliArg.note + c.END
+if arg.note:
+    print g.PLUS + c.BOLD + "Note: %s" % arg.note + c.END
     print g.PIPE
 
-targetIPrange = targetIPaddress.split(".")
-targetIPrange = targetIPrange[0] + "." + targetIPrange[1] + "." + targetIPrange[2] + ".0"
+iIPr = tIP.split(".")
+iIPr = iIPr[0] + "." + iIPr[1] + "." + iIPr[2] + ".0"
 
-if targetDomain == "Not defined":
-    printh("Using IP address %s, no domain specified. Unable to run some modules." % targetIPaddress)
+if tD == "Not defined":
+    printh("Using IP address %s, no domain specified. Unable to run some modules." % tIP)
 else:
-    printh("Using IP address %s for domain %s" % (targetIPaddress, targetDomain))
-
-
-if targetIPaddress != "127.0.0.1":
-    iptype = IP(targetIPaddress).iptype()
+    printh("Using IP address %s for domain %s" % (tIP, tD))
+if tIP != "127.0.0.1":
+    iptype = IP(tIP).iptype()
 else:
     iptype="PUBLIC"
-
 if iptype == "PRIVATE" or iptype == "LOOPBACK":
     printh("IP address type is %s this may lead to errors." % iptype.lower())
 else:
-    "Fully Qualified Doman Name: " + socket.getfqdn(targetIPaddress) + c.END
-
-### START MODULES
+    "Fully Qualified Doman Name: " + socket.getfqdn(tIP) + c.END
 
 ### GOOGLE SAFE BROWSING API LOOKUP
-if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetDomain != "Not defined":
+if (arg.googlesafebrowsing or arg.lists or arg.all) and tD != "Not defined":
     try:
         GoogleAPIKey = os.environ['GAPIKEY']
         run.append("Google Safe Browsing")
         printh("Querying Google Safe Browsing API with domain name")
-        target = 'http://' + targetDomain + '/'
+        target = 'http://' + tD + '/'
         parameters = {'client': 'check-lookup-tool', 'key': GoogleAPIKey, 'appver': '1.0', 'pver': '3.1', 'url': target}
         reply = requests.get("https://sb-ssl.google.com/safebrowsing/api/lookup", params=parameters, headers=headers)
         if reply.status_code == 200:
-            print g.PIPE + c.Y + "Status %s: Address http://%s/ found:" % (reply.status_code, targetDomain), reply.text + c.END
+            print g.PIPE + c.Y + "Status %s: Address http://%s/ found:" % (reply.status_code, tD), reply.text + c.END
         elif reply.status_code == 204:
             print g.PIPE + c.G + "Status %s: The requested URL is legitimate." % (reply.status_code) + c.END
         elif reply.status_code == 400:
@@ -272,18 +266,17 @@ if (cliArg.googlesafebrowsing or cliArg.lists or cliArg.all) and targetDomain !=
         print g.PIPE
     except KeyError:
         printe("Google API key not present.", "Google Safe Browsing")
-
 else:
     notRun.append("Google Safe Browsing")
 
 ### WEB OF TRUST API LOOKUP
-if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetDomain != "Not defined":
+if (arg.weboftrust or arg.lists or arg.all) and tD != "Not defined":
     try:
         WOTAPIKey = os.environ['WOTAPIKEY'] ### same here.
         run.append("Web Of Trust")
         printh("Querying Web Of Trust reputation API with domain name")
-        target = 'http://' + targetDomain + '/'
-        parameters = {'hosts': targetDomain + "/", 'key': WOTAPIKey}
+        target = 'http://' + tD + '/'
+        parameters = {'hosts': tD + "/", 'key': WOTAPIKey}
         reply = requests.get("http://api.mywot.com/0.4/public_link_json2", params=parameters, headers=headers)
         reply_dict = json.loads(reply.text)
         categories = {
@@ -310,7 +303,7 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetDomain != "Not de
         '501': c.G + 'Positive: Good site' + c.END}
         if reply.status_code == 200:
             hasKeys = False
-            for key, value in reply_dict[targetDomain].iteritems():
+            for key, value in reply_dict[tD].iteritems():
                 if key == "target":
                     print g.PLUS + "Server response OK, Web Of Trust Reputation Score for", c.BOLD + value + ":" + c.END
                 elif key == "1":
@@ -347,7 +340,7 @@ if (cliArg.weboftrust or cliArg.lists or cliArg.all) and targetDomain != "Not de
                 else:
                     print "Unknown key", key, " => ", value
         if hasKeys == False:
-            print g.PIPE + c.G + "Web Of Trust has no records for", targetDomain + c.END
+            print g.PIPE + c.G + "Web Of Trust has no records for", tD + c.END
             print g.PIPE
         if reply.status_code != 200:
             printe("Server returned status code %s see https://www.mywot.com/wiki/API for details." % reply.status_code, "Web Of Trust")
@@ -357,22 +350,21 @@ else:
     notRun.append("Web Of Trust")
 
 ### BLACKLISTS
-if cliArg.blacklists or cliArg.lists or cliArg.all:
+if arg.blacklists or arg.lists or arg.all:
     run.append("Blacklists")
     removed = trimcache(72) # Delete entries older than 72h
     print g.STAR + c.B + "Cache trim: %s MB removed, current cache size %s MB." % removed + c.END
     totalLines = 0
     if os.path.isfile(blacklistSourceFile) == True:
         with open(blacklistSourceFile) as sourcefile:
-            sourceListLine = sourcefile.readlines()
+            blacklists = sourcefile.readlines()
             sourceCount = 0
     else:
         printe("No blacklist file found at %s" % blacklistSourceFile, "blacklist")
-        sourceListLine = ""
+        blacklists = ""
         cachefilew = open(os.devnull, "w+")
         cachefiler = open(os.devnull, "r+")
-
-    for line in sourceListLine:
+    for line in blacklists:
         if line[:1] == "#":
             continue
         else:
@@ -380,41 +372,35 @@ if cliArg.blacklists or cliArg.lists or cliArg.all:
     printh("Downloading and searching blacklists for address.")
     i = 0
     cacherefreshcount = 0
-    for sourceline in sourceListLine:
+    for sourceline in blacklists:
         sourceline = sourceline.split("|")
         sourceurl = sourceline[0].replace("\n", "").replace(" ", "")
-
         if sourceurl[:1] == "#":
             continue # Skip comment lines
-
         try:
             sourcename = sourceline[1].replace("\n", "")
         except IndexError:
             sourcename = sourceline[0].replace("\n", "") # If no name specified use URL.
-
         i += 1
         listfile = ""
         linecount = 0
         domainmatch = False
         ipmatch = False
         print g.PLUS + "Downloading from " + c.BOLD + sourcename + c.END + " [%s of %s sources]:" % (i, sourceCount) + c.END
-
         try:
             data = ""
             head = requests.head(sourceurl, headers=headers)
         except Exception:
             print g.PIPE + "[" + c.R + "Fail!" + c.END + "] Unable to connect to %s" % (sourcename)
             continue
-
         try:
             timestamp = head.headers['Last-Modified']
         except KeyError:
             timestamp = "1970-01-02 00:00:00"
-
         eStamp = int(time.mktime(dateutil.parser.parse(timestamp).timetuple()))
         agediff = eNow - eStamp
         filehash = hashlib.md5(sourceurl.encode('utf-8')).hexdigest()
-        cachepath = scriptpath + "cache/" + str(eStamp) + "-" + filehash
+        cachepath = ownPath + "cache/" + str(eStamp) + "-" + filehash
         if eStamp == 79200:
             usecache = False
         else:
@@ -422,10 +408,8 @@ if cliArg.blacklists or cliArg.lists or cliArg.all:
         if usecache == True:
             if agediff >= 60:
                 age = "%s%s%s minutes ago" % (c.G, (agediff / 60), c.END)
-
             if agediff >= 3600:
                 age = "%s%s%s hours ago" % (c.G, (agediff / 3600), c.END)
-
             if agediff >= 86400:
                 if (agediff / 86400) >= 14:
                     age = "%s%s%s days ago, %sstale source?%s" %(c.R, (agediff / 86400), c.END, c.R, c.END)
@@ -446,23 +430,22 @@ if cliArg.blacklists or cliArg.lists or cliArg.all:
             totalLines = totalLines + (linecount - 1)
             req = None
             for line in lines:
-                if targetDomain != "Not defined":
-                    if targetDomain in line:
+                if tD != "Not defined":
+                    if tD in line:
                         domainmatch = True
-                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(targetDomain, c.R + targetDomain + c.END).replace("\n", "")
-                if targetIPaddress in line:
+                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(tD, c.R + tD + c.END).replace("\n", "")
+                if tIP in line:
                     ipmatch = True
-                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(targetIPaddress, c.R + targetIPaddress + c.END).replace("\n", "")
-                if targetIPrange in line:
+                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(tIP, c.R + tIP + c.END).replace("\n", "")
+                if iIPr in line:
                     ipmatch = True
-                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(targetIPrange, c.R + targetIPrange + c.END).replace("\n", "")
-            if domainmatch == False and ipmatch == True and targetDomain != "Not defined":
+                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(iIPr, c.R + iIPr + c.END).replace("\n", "")
+            if domainmatch == False and ipmatch == True and tD != "Not defined":
                 print g.PIPE + "Domain name not found." + c.END
             elif ipmatch == False and domainmatch == True:
                 print g.PIPE + "IP address not found." + c.END
             else:
                 print g.PIPE + "Address "+ c.G + "not found" + c.END + " in list." + c.END
-
         if usecache == False:
             cacherefreshcount += 1
             req = requests.get(sourceurl, stream=True, headers=headers)
@@ -524,27 +507,22 @@ if cliArg.blacklists or cliArg.lists or cliArg.all:
             print "\r\n" + g.PIPE + "Searching from %s lines." % (linecount) + c.END
             totalLines = totalLines + linecount
             for line in listfile.splitlines():
-                if targetDomain != "Not defined":
-                    if targetDomain in line:
+                if tD != "Not defined":
+                    if tD in line:
                         domainmatch = True
-                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(targetDomain, c.R + targetDomain + c.END).replace("\n", "")
-                if targetIPaddress in line:
+                        print g.PIPE + c.Y + "Domain match! " + c.END + line.replace(tD, c.R + tD + c.END).replace("\n", "")
+                if tIP in line:
                     ipmatch = True
-                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(targetIPaddress, c.R + targetIPaddress + c.END).replace("\n", "")
-                if targetIPrange in line:
+                    print g.PIPE + c.Y + "IP match! " + c.END + line.replace(tIP, c.R + tIP + c.END).replace("\n", "")
+                if iIPr in line:
                     ipmatch = True
-                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(targetIPrange, c.R + targetIPrange + c.END).replace("\n", "")
-            if domainmatch == False and ipmatch == True and targetDomain != "Not defined":
+                    print g.PIPE + c.Y + "Range match! " + c.END + line.replace(iIPr, c.R + iIPr + c.END).replace("\n", "")
+            if domainmatch == False and ipmatch == True and tD != "Not defined":
                 print g.PIPE + "Domain name not found." + c.END
             elif ipmatch == False and domainmatch == True:
                 print g.PIPE + "IP address not found." + c.END
             else:
                 print g.PIPE + "Address "+ c.G + "not found" + c.END + " in list." + c.END
-
-          #except Exception:
-              #printe("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "blacklist")
-              #runerrors = True
-
     cachefiler.close()
     cachefilew.close()
     print g.PLUS + "A total of %s lines searched, %s cached files updated." % (totalLines, cacherefreshcount) + c.END
@@ -553,31 +531,30 @@ else:
     notRun.append("Blacklists")
 
 ### SPAMLISTS
-if cliArg.spamlists or cliArg.lists or cliArg.all:
+if arg.spamlists or arg.lists or arg.all:
     run.append("Spamlists")
-    printh("Querying spamlists for %s..." % targetIPaddress)
+    printh("Querying spamlists for %s..." % tIP)
     for bl in sourceListSpamDNS:
         try:
             my_resolver = dns.resolver.Resolver()
-            query = '.'.join(reversed(str(targetIPaddress).split("."))) + "." + bl
+            query = '.'.join(reversed(str(tIP).split("."))) + "." + bl
             answers = my_resolver.query(query, "A")
             answer_txt = my_resolver.query(query, "TXT")
-            print g.PIPE + c.Y + 'IP: %s IS listed in %s (%s: %s)' %(targetIPaddress, bl, answers[0], answer_txt[0]) + c.END
+            print g.PIPE + c.Y + 'IP: %s IS listed in %s (%s: %s)' %(tIP, bl, answers[0], answer_txt[0]) + c.END
         except dns.resolver.NXDOMAIN:
-            print g.PIPE + 'IP: %s is NOT listed in %s' %(targetIPaddress, bl)
+            print g.PIPE + 'IP: %s is NOT listed in %s' %(tIP, bl)
     print g.PIPE
 else:
     notRun.append("Spamlists")
 
 ### VIRUSTOTAL
-
-if cliArg.virustotal or cliArg.lists or cliArg.all:
+if arg.virustotal or arg.lists or arg.all:
     try:
         VirusTotalAPIKey = os.environ['VTAPIKEY'] ### Export your api keys to shell variables or put them here, add "Export VTAPIKEY=yourapikey to .bashrc or whatever your using."
         run.append("VirusTotal")
-        printh("Querying VirusTotal for %s..." % targetIPaddress)
+        printh("Querying VirusTotal for %s..." % tIP)
         parameters = {
-            'ip': targetIPaddress,
+            'ip': tIP,
             'apikey': VirusTotalAPIKey
                     }
         vtresponse = requests.get('https://www.virustotal.com/vtapi/v2/ip-address/report', params=parameters).content
@@ -600,13 +577,11 @@ if cliArg.virustotal or cliArg.lists or cliArg.all:
                     print g.PIPE
     except KeyError:
         printe("VirusTotal API key not present.", "VirusTotal")
-
-
 else:
     notRun.append("VirusTotal")
 
 ### PASSIVETOTAL
-if cliArg.passivetotal or cliArg.lists or cliArg.all:
+if arg.passivetotal or arg.lists or arg.all:
     try:
         PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
         run.append("PassiveTotal")
@@ -614,10 +589,10 @@ if cliArg.passivetotal or cliArg.lists or cliArg.all:
         requests.packages.urllib3.disable_warnings()
         #define API key
         pt = PassiveTotal(PassiveTotalAPIKey)
-        printh("Querying PassiveTotal for %s..." % targetIPaddress)
+        printh("Querying PassiveTotal for %s..." % tIP)
         try:
             response = ""
-            response = pt.get_passive(targetIPaddress)
+            response = pt.get_passive(tIP)
         except ValueError:
             printe("Value error - no data received.", "PassiveTotal")
         if response == "":
@@ -640,17 +615,16 @@ if cliArg.passivetotal or cliArg.lists or cliArg.all:
 else:
     notRun.append("PassiveTotal")
 
-
 ### GEOIP
-if cliArg.geoip or cliArg.lists or cliArg.all:
+if arg.geoip or arg.lists or arg.all:
     run.append("GeoIP")
     if os.path.isfile(GeoIPDatabaseFile) == True:
         latitude = ""
         longitude = latitude
         try:
             gi = GeoIP.open(GeoIPDatabaseFile, GeoIP.GEOIP_STANDARD)
-            gir = gi.record_by_addr(targetIPaddress)
-            printh("Querying GeoIP database for %s" % targetIPaddress)
+            gir = gi.record_by_addr(tIP)
+            printh("Querying GeoIP database for %s" % tIP)
             if gir is None:
                 printe("No geodata found for IP address.", "GeoIP")
             else:
@@ -662,7 +636,7 @@ if cliArg.geoip or cliArg.lists or cliArg.all:
                     print g.PIPE + str(key) + ": " + str(value)
                 if latitude != "" and longitude != "":
                     print g.PIPE + "Google maps link for location: " + c.UL + "https://maps.google.com/maps?q="+str(latitude)+","+str(longitude) + c.END
-                if cliArg.openlink:
+                if arg.openlink:
                     webbrowser.open('https://maps.google.com/maps?q='+str(latitude)+','+str(longitude))
         except Exception:
             printe("Failed: %s %s " % (str(sys.exc_info()[0]), str(sys.exc_info()[1])), "GeoIP")
@@ -674,20 +648,20 @@ else:
     notRun.append("GeoIP")
 
 ### WHOIS
-if cliArg.whois or cliArg.lists or cliArg.all:
+if arg.whois or arg.lists or arg.all:
     run.append("Whois")
     results = results2 = ""
     try:
-        results = subprocess.check_output("whois "+targetIPaddress, shell=True)
+        results = subprocess.check_output("whois "+tIP, shell=True)
     except subprocess.CalledProcessError:
         printe("Whois returned an error.", "Whois")
-    if targetDomain != "Not defined":
+    if tD != "Not defined":
         try:
-            results2 = subprocess.check_output("whois "+targetDomain, shell=True)
+            results2 = subprocess.check_output("whois "+tD, shell=True)
         except subprocess.CalledProcessError:
             printe("Whois returned an error.", "Whois")
     if results:
-        printh("Querying IP Address %s" % targetIPaddress)
+        printh("Querying IP Address %s" % tIP)
         for line in results.splitlines():
             if ("abuse" in line and "@" in line) or "address" in line or "person" in line or "phone" in line:
                 print g.PIPE + c.BOLD + c.B + line + c.END
@@ -696,7 +670,7 @@ if cliArg.whois or cliArg.lists or cliArg.all:
             else:
                 print g.PIPE + line  + c.END
     if results2:
-        print c.HDR +  g.PLUS + "Resolved address " + targetIPaddress + " for domain " + targetDomain + c.END
+        print c.HDR +  g.PLUS + "Resolved address " + tIP + " for domain " + tD + c.END
         for line in results2.splitlines():
             if "#" in line:
                 ()
@@ -711,15 +685,15 @@ else:
     notRun.append("Whois")
 
 #### PING
-if cliArg.ping or cliArg.probes or cliArg.all:
+if arg.ping or arg.probes or arg.all:
     run.append("Ping")
-    printh("Pinging %s, skip with CTRL-C..." % targetIPaddress)
+    printh("Pinging %s, skip with CTRL-C..." % tIP)
     try:
-        response = os.system("ping -c 1 " + targetIPaddress + " > /dev/null 2>&1")
+        response = os.system("ping -c 1 " + tIP + " > /dev/null 2>&1")
         if response == 0:
-            print g.PIPE + c.G + targetIPaddress, 'is responding to ping.' + c.END
+            print g.PIPE + c.G + tIP, 'is responding to ping.' + c.END
         else:
-            print g.PIPE + c.R + targetIPaddress, 'is not responding to ping.' + c.END
+            print g.PIPE + c.R + tIP, 'is not responding to ping.' + c.END
             print g.PIPE + c.END
     except KeyboardInterrupt:
         print c.Y + g.MINUS + "Skipping ping." + c.END
@@ -729,15 +703,15 @@ else:
     notRun.append("Ping")
 
 ### OPENSSL
-if cliArg.cert or cliArg.probes or cliArg.all:
+if arg.cert or arg.probes or arg.all:
     run.append("OpenSSL")
     results = None
     try:
-        results = subprocess.check_output("echo | openssl s_client -showcerts -servername %s -connect %s:443 2>/dev/null | openssl x509 -inform pem -noout -text" % (targetDomain, targetDomain), shell=True)
+        results = subprocess.check_output("echo | openssl s_client -showcerts -servername %s -connect %s:443 2>/dev/null | openssl x509 -inform pem -noout -text" % (tD, tD), shell=True)
     except subprocess.CalledProcessError:
         printe("OpenSSL returned an error.", "OpenSSL")
     if results:
-        printh("Certificate information for https://%s/" % targetDomain)
+        printh("Certificate information for https://%s/" % tD)
         for line in results.splitlines():
             if "Issuer" in line or "Subject:" in line or "DNS:" in line or "Not Before" in line or "Not After" in line:
                 print g.PIPE + c.B + line.replace("  ", " ") + c.END
@@ -747,7 +721,7 @@ else:
     notRun.append("OpenSSL")
 
 ### SCANPORTS & SCANHEADERS
-if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
+if arg.scanports or arg.scanheaders or arg.probes or arg.all:
     run.append("Portscan")
     printh("Scanning common ports...")
     socket.setdefaulttimeout(1)
@@ -755,31 +729,29 @@ if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
     try:
         for port in targetPortscan:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            result = sock.connect_ex((targetIPaddress, port))
+            result = sock.connect_ex((tIP, port))
             if result == 0:
                 print g.PIPE + c.G + "port " + str(port) + " is open." + c.END
                 openports.append(port)
             else:
                 print g.PIPE + "Port %s is closed." % port
             sock.close()
-
-        if (cliArg.scanheaders or cliArg.probes or cliArg.all) and targetDomain != "Not defined":
+        if (arg.scanheaders or arg.probes or arg.all) and tD != "Not defined":
             for port in openports:
-                url = "http://" + targetDomain
+                url = "http://" + tD
                 try:
                     if port == 443:
                         protocol = "https://"
                     else:
                         protocol = "http://"
                     print g.PIPE
-                    print g.PLUS + "Getting headers for %s%s:%s" % (protocol, targetDomain, port) + c.END
-                    page = requests.head('%s%s:%s' % (protocol, targetDomain, port), headers={'user-agent': random.choice(uapool), 'referer': 'https://www.google.com'})
+                    print g.PLUS + "Getting headers for %s%s:%s" % (protocol, tD, port) + c.END
+                    page = requests.head('%s%s:%s' % (protocol, tD, port), headers={'user-agent': random.choice(uapool), 'referer': 'https://www.google.com'})
                     print g.PIPE + c.BOLD + "Server response code: %s" % page.status_code + c.END
                     for key, value in page.headers.items():
                         print g.PIPE + c.BOLD + "%s: %s" % (key, value) + c.END
                 except Exception,e:
                     printe(str(e), "Headerscan")
-
     except KeyboardInterrupt:
         print c.R + g.STAR + "Caught Ctrl+C, interrupting..."
         sys.terminate()
@@ -792,7 +764,6 @@ if cliArg.scanports or cliArg.scanheaders or cliArg.probes or cliArg.all:
     print g.PIPE + c.END
 else:
     notRun.append("Portscan")
-if logfile != "":
+if logfile != None:
     printh("Writing log file to %s" % logfile)
-
 terminate()
