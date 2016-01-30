@@ -57,7 +57,7 @@ x9x+QuUtayG5w3EwF"]
 
 if not arg.nosplash:
     print zlib.decompress(b64decode(random.choice(splash)))
-    print "Check.py - Extended lookup tool. See -h for command line option"
+    print "Check.py - Extended lookup tool. See -h for command line options.\n"
 
 ## Specify resources and API keys
 ownPath = os.path.dirname(sys.argv[0]) + "/"
