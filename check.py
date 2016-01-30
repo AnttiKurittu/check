@@ -215,7 +215,7 @@ elif arg.domain:
         tIP = socket.gethostbyname(tD)
     except socket.gaierror:
         printe("Resolve error, assignign 127.0.0.1 as ip", "Domain resolve")
-        printe("Can not resolve IP address, assignigin 127.0.0.1...", "Domain resolve")
+        printe("Can not resolve IP address, assigning 127.0.0.1...", "Domain resolve")
         tIP = "127.0.0.1"
 else:
     printe("No target given, exiting...", "Target")
