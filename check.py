@@ -6,10 +6,11 @@ import datetime
 
 startTime = datetime.datetime.now()
 
-import os, sys, socket, urllib, urllib2, json, argparse, webbrowser, subprocess,\
-    zipfile, dns.resolver, requests, GeoIP, StringIO, operator, random, hashlib,\
-    dateutil.parser, time
+import os, sys, socket, json, argparse, webbrowser, subprocess, zipfile,\
+    dns.resolver, requests, GeoIP, StringIO, operator, random, hashlib,\
+    dateutil.parser, time, zlib, gzip
 from passivetotal import PassiveTotal
+from base64 import b64encode, b64decode
 from IPy import IP
 
 parser = argparse.ArgumentParser(description='Get actions')
@@ -39,17 +40,24 @@ parser.add_argument("-NG", "--nogfx", help="Suppress line graphics", action="sto
 parser.add_argument("-S", "--nosplash", help="Suppress cool ASCII header graphic", action="store_true")
 arg = parser.parse_args()
 
-if not arg.nosplash:
-    print "       .__                   __"
-    print "  ____ |  |__   ____   ____ |  | __    ______ ___.__."
-    print "_/ ___\|  |  \_/ __ \_/ ___\|  |/ /    \____ <   |  |"
-    print "\  \___|   Y  \  ___/\  \___|    <     |  |_> >___  |"
-    print " \___  >___|  /\___  >\___  >__|_ \ /\ |   __// ____|"
-    print "     \/     \/     \/     \/     \/ \/ |__|   \/"
-    print ""
-    print "Simple address information aggregation tool. See -h for arguments and usage."
-    print ""
+splash = [
+"eJyVUj2LwzAM3f0rdIJcoAV16aAL/cjSpYRQbutyBC7tUjp66dDfXn04rRO4wgkiy0/vSbaVAP81oj\
+DaxtP5B/9kr4BuNWOXaaqeefe2xUctjKQg+TqeKChmsboyMWKQXP/N3MrGMLrxRRlRujKTiQeCM2LNb\
+RNWEmuVi6P3rfgGqoSKMCMYo0PmGYYviaE84lDNfW8oc4GQEdKJ+pZc5pbJrNPcqBnBD6S5N7LG0anM\
+XuYz6G04Ei1GOrvZLwHNISMkhlaSUaMmDiXAVdZ2rckNOMqFdnkSSo1mCEtZUKeHiur4htexHR4T/CJ\
+IhO5Hv5baPtUaWV1MoArDAzKkfNg=",  "eJxtjcENwDAIA/9MwS+fSl6goyA5+09RDE3VVkEiFodjz\
+KtI3xVppQiPzVrY5KL2wZXSujBGmjDu0ekzX82pDz78NFRG3eqPchNvHDOsLzGkqzvliy0TRCDF3Zr/\
+2C5j6z7d",  "eJxtTcsVwCAIuzNFskAH4MT+U1VIkdpX4Gl+ogGhyrtIC/FjYbSOGigjFbZMKafF3v\
+CKURuefFC9AOmsDWNFk8GVNjj7Q3oeFMg6rCbbLWgr5TXIgatz/GuJYT/H5XYDCyc3BA==",  "eJyN\
+T7ENwzAM230FtyRAET+QUwzwER5fUVIytEMrDRQpkLYGqoiv4ihU9EeFFEuSnpheJrSE1gpZYTOYhI1\
+YMAloSTMmp+ZO1UPYOy1azp63BFyO9eOHd2L+aNFxLJ7kkRbXzkM4IwVWX3nCr3put+0vA9UYjvEGA0\
+BOyA==",  "eJxtTrENwDAI27nCF4QHovxRCYlHcnxtaNUMRSjBBowNT4xM/EWm6VF3M3uq8UHj41Xx\
+od6wdJXRIwgURpy0w7UZtRgTrWfRlAAu1lGiftKYZbBcLaxoM9YDWLSa7PmLP3rzELzOU1QGdJybZcT\
+x9x+QuUtayG5w3EwF"]
 
+if not arg.nosplash:
+    print zlib.decompress(b64decode(random.choice(splash)))
+    print "Check.py - Extended lookup tool. See -h for command line option"
 
 ## Specify resources and API keys
 ownPath = os.path.dirname(sys.argv[0]) + "/"
@@ -416,12 +424,12 @@ if arg.blacklists or arg.lists or arg.all:
                 else:
                     age = "%s%s%s days ago" % (c.Y, (agediff / 86400), c.END)
             print g.PIPE + "[" + c.B + "Cache" + c.END + "] Using a cached copy. Source updated %s." % age
-            cachefiler = open(cachepath, "r+")
+            cachefiler = gzip.open(cachepath, "r+")
             cachefilew = open(os.devnull, "w+")
         else:
-            cachefilew = open(cachepath, "w+")
+            #os.remove(cachefilew)
+            cachefilew = gzip.open(cachepath, "w+")
             cachefiler = open(os.devnull, "r+")
-            cachefilew.truncate()
         if usecache == True:
             lines = cachefiler.readlines()
             for line in lines:
@@ -586,7 +594,7 @@ if arg.passivetotal or arg.lists or arg.all:
         PassiveTotalAPIKey = os.environ['PTAPIKEY'] ### same here.
         run.append("PassiveTotal")
         #disable passivetotal's error message
-        requests.packages.urllib3.disable_warnings()
+        #requests.packages.3.disable_warnings()
         #define API key
         pt = PassiveTotal(PassiveTotalAPIKey)
         printh("Querying PassiveTotal for %s..." % tIP)
