@@ -73,7 +73,7 @@ parser.add_argument("-wt",
                     action="store_true")
 parser.add_argument("-sl",
                     "--spamlists",
-                    help="Check SURBL and SpamHaus blocklists for IP",
+                    help="Check various spam blacklists for IP",
                     action="store_true")
 parser.add_argument("-bl",
                     "--blacklists",
