@@ -25,17 +25,17 @@ import dateutil.parser
 import time
 import zlib
 import gzip
+from TwitterSearch import *
 from passivetotal import PassiveTotal
-from base64 import b64encode, b64decode
+from base64 import b64decode
 from IPy import IP
 
 parser = argparse.ArgumentParser(description='Get actions')
-parser.add_argument(
-    "-d",
-    "--domain",
-    metavar='domain name',
-    type=str,
-    help="Target domain name")
+parser.add_argument("-d",
+                    "--domain",
+                    metavar='domain name',
+                    type=str,
+                    help="Target domain name")
 parser.add_argument("-i",
                     "--ip",
                     metavar='IP address',
@@ -47,17 +47,15 @@ parser.add_argument("-a",
                     action="store_true")
 parser.add_argument("-l",
                     "--lists",
-                    help="run all third-party queries (blacklists, spamlists, \
-virustotal, passivetotal, whois, geoip)",
+                    help="run all third-party lists for matches",
                     action="store_true")
 parser.add_argument("-p",
                     "--probes",
-                    help="run all host-contacting probes (ping, scan ports, \
-scan headers, certificate)",
+                    help="run all host-contacting probes",
                     action="store_true")
 parser.add_argument("-pg",
                     "--ping",
-                    help="Ping IP address",
+                    help="Ping address",
                     action="store_true")
 parser.add_argument("-ws",
                     "--whois",
@@ -73,39 +71,48 @@ parser.add_argument("-sp",
                     action="store_true")
 parser.add_argument("-gi",
                     "--geoip",
-                    help="Query GeoIP database",
+                    help="Query local GeoIP database",
                     action="store_true")
 parser.add_argument("-sh",
                     "--scanheaders",
-                    help="Scan common ports and try to retrieve HTTP headers",
+                    help="Scan common ports and try to retrieve headers",
+                    action="store_true")
+parser.add_argument("-ms",
+                    "--metascan",
+                    help="Query Metscan Online for detections",
                     action="store_true")
 parser.add_argument("-gs",
                     "--googlesafebrowsing",
-                    help="Check Google Safe Browsing database",
+                    help="Query Google Safe Browsing database",
                     action="store_true")
 parser.add_argument("-wt",
                     "--weboftrust",
-                    help="Query Web Of Trust database",
+                    help="Query Web Of Trust reputation database",
                     action="store_true")
 parser.add_argument("-sl",
                     "--spamlists",
-                    help="Check various spam blacklists for IP",
+                    help="Check a number of spam resolvers for IP",
                     action="store_true")
 parser.add_argument("-bl",
                     "--blacklists",
-                    help="Check blacklists for target",
+                    help="Check local and third-party blacklists for matches",
                     action="store_true")
 parser.add_argument("-pt",
                     "--passivetotal",
-                    help="Query passive DNS records from PassiveTotal",
+                    help="Query passive DNS records from PassiveTotal for IP",
                     action="store_true")
 parser.add_argument("-vt",
                     "--virustotal",
-                    help="Query passive DNS records from VirusTotal",
+                    help="Query passive DNS and detection records from VirusTotal",
                     action="store_true")
+parser.add_argument("-tw",
+                    "--twitter",
+                    help="Search Twitter for recent mentions of Domain or IP",
+                    action="store_true")
+
 parser.add_argument("-nt",
                     "--note",
-                    metavar='Add a note',
+                    metavar='note',
                     type=str,
                     help="Add a note to the output, \
 this could be a project name or description of address.")
@@ -115,7 +122,7 @@ parser.add_argument("-O",
                     action="store_true")
 parser.add_argument("-L",
                     "--logfile",
-                    type=str,help="Specify log file, default is log/check\
+                    type=str,help="Specify a log file, default is ./log/check\
 -[IP]-[DATETIME].log")
 parser.add_argument("-NL",
                     "--nolog",
@@ -133,13 +140,29 @@ parser.add_argument("-S", "--nosplash",
 
 arg = parser.parse_args()
 
+if arg.lists is True or arg.all is True:
+    arg.googlesafebrowsing = True
+    arg.weboftrust = True
+    arg.virustotal = True
+    arg.passivetotal = True
+    arg.blacklists = True
+    arg.spamlists = True
+    arg.twitter = True
+    arg.metascan = True
+
+if arg.probes is True or arg.all is True:
+    arg.cert = True
+    arg.ping = True
+    arg.scanheaders = True
+    arg.scanports = True
+
+if arg.all is True:
+    arg.whois = True
+    arg.geoip = True
+
 splash = zlib.decompress(b64decode("eJxtkNENgDAIRP87xf364y3gIiYkLMLwQhEtxktJKUc\
 ebYeWsHu49EdRRerj7BFDNB2IARa7Viu7lyApbGRR9RgMvPjibPTUcuCm6B7zbHUhEgWRWQt+nE/MqS\
 npHg48ECtDJ+S9H7OZzz+weeavAiWefEN5f5BDaizXrWWLtxSXjgvlm2ST"))
-
-if not arg.nosplash:
-    print splash
-    print "\nCheck.py - Extended lookup tool. See -h for command line options.\n"
 
 # Specify resources and API keys
 ownPath = os.path.dirname(sys.argv[0]) + "/"
@@ -147,6 +170,7 @@ if ownPath is "/" or ownPath is "":
     ownPath = "./"
 curDate = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 eNow = int(time.mktime(dateutil.parser.parse(curDate).timetuple()))
+
 # Specify database file location
 GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat"
 targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53]  # What ports to scan
@@ -191,6 +215,7 @@ hasError = []  # Gather erring modules
 logfile = None  # Set variable as blank to avoid errors further on.
 notRun = []  # Gather skipped modules
 run = []  # Gather executed modules
+missingkeys = []
 
 if arg.monochrome:
     class c:
@@ -221,7 +246,6 @@ else:
 
 
 class Logger(object):  # Log output to file, remove colors.
-
     def __init__(self, filename=logfile):
         self.terminal = sys.stdout
         self.log = open(filename, "w")
@@ -238,8 +262,8 @@ class Logger(object):  # Log output to file, remove colors.
     def flush(self):
         self.terminal.flush()
 
-
 def terminate():  # Graceful exit.
+    global missingkeys
     stopTime = datetime.datetime.now()
     totalTime = stopTime - startTime
     if len(hasError) > 0:
@@ -251,8 +275,9 @@ def terminate():  # Graceful exit.
             "Executed %s modules in %s seconds." %
             (len(run), totalTime.seconds))
     printh("Skipped %s modules." % len(notRun))
+    if len(missingkeys) >0:
+        printh("No API keys configured for: %s" % (str(", ".join(missingkeys))))
     exit()
-
 
 # Removes cache files older than h, returns removed megabyte amount.
 def trimcache(h):
@@ -275,25 +300,24 @@ def trimcache(h):
     megabytesLeft = (cacheSize - removedSize) / 1000000
     return megabytesRemoved, megabytesLeft
 
-
 def printe(message, module):
     if module != "":
         print g.FAIL + c.R + ("%s: %s" % (module, message)) + c.END
         hasError.append(module)
     else:
         print g.FAIL + c.R + ("%s" % message) + c.END
-    return True
-
 
 def printh(message):
     print g.STAR + c.HDR + message + c.END
-    return True
-
 
 def printp(message):
     print g.PLUS + c.END + message
-    return True
 
+def printl(message, color = ""):
+    print g.PIPE + color + message + c.END
+
+def pipe():
+    print c.D + g.PIPE + c.END
 
 def validate_ip(ip):  # Validate IP address format
     try:
@@ -307,31 +331,88 @@ def matchfinder(f):
     out = []
     dm = ipm = rm = False
     for line in f:
-        if Domain != "Not defined" and Domain in line:
+        if Domain != "" and Domain in line:
             dm = True
             out.append(
-                g.PIPE + c.Y + "Domain match! " + c.END + line.replace(Domain, c.R + Domain + c.END).replace("\n",
-                                                                                                             ""))
+                c.Y + "Domain match! " + c.END + line.replace(Domain, c.R + Domain + c.END).replace("\n", ""))
             matchcollector.append(line)
-        if IPaddr in line:
+        if IPaddr != "" and IPaddr in line:
             ipm = True
             out.append(
-                g.PIPE + c.Y + "IP match! " + c.END + line.replace(IPaddr, c.R + IPaddr + c.END).replace("\n", ""))
+                c.Y + "IP match! " + c.END + line.replace(IPaddr, c.R + IPaddr + c.END).replace("\n", ""))
             matchcollector.append(line)
-        if iIPr in line:
+        if iIPr != "" and iIPr in line:
             ipm = True
             out.append(
-                g.PIPE + c.Y + "Range match! " + c.END + line.replace(iIPr, c.R + iIPr + c.END).replace("\n", ""))
+                c.Y + "Range match! " + c.END + line.replace(iIPr, c.R + iIPr + c.END).replace("\n", ""))
             matchcollector.append(line)
-    if dm == False and ipm == True and Domain != "Not defined":
+    if dm == False and ipm == True and Domain != "":
         out.append(g.PIPE + "Domain name not found." + c.END)
     elif ipm == False and dm == True:
-        out.append(g.PIPE + "IP address not found." + c.END)
+        out.append("IP address not found." + c.END)
     else:
-        out.append(g.PIPE + "Address " + c.G + "not found" + c.END + " in list." + c.END)
+        out.append("Address " + c.G + "not found" + c.END + " in list." + c.END)
     return out
 
-# PROCESS CLI ARGUMENTS
+if not arg.nosplash:
+    print splash
+    print "\nCheck.py - Extended lookup tool. See -h for command line options.\n"
+
+# Read or create configuration file
+if os.path.isfile(ownPath + "apikeys.conf"):
+    settings = {}
+    with open(ownPath + "apikeys.conf", "r+") as f:
+        for line in f:
+            if line[0] == "#":
+                continue
+            if ":" in line:
+                (key, val) = line.split(":")
+                settings[key.strip()] = val.strip()
+        f.close()
+    if settings['WebOfTrustAPIKey'] is "":
+        missingkeys.append("Web Of Trust")
+        arg.weboftrust = False
+    if settings['VirusTotalAPIKey'] is "":
+        missingkeys.append("VirusTotal")
+        arg.virustotal = False
+    if settings['MetaScanAPIKey'] is "":
+        missingkeys.append("MetaScan")
+        arg.metascan = False
+    if settings['GoogleAPIKey'] is "":
+        missingkeys.append("Google")
+        arg.googlesafebrowsing = False
+    if settings['PassiveTotalAPIKey'] is "":
+        missingkeys.append("PassiveTotal")
+        arg.passivetotal = False
+    if settings['TwitterConsumerKey'] is ""\
+            or settings['TwitterConsumerSecret'] is ""\
+            or settings['TwitterAccessToken'] is ""\
+            or settings['TwitterAccessTokenSecret'] is "":
+        missingkeys.append("Twitter")
+        arg.twitter = False
+
+else: # If no configuration file present, create one.
+    printe("No API key configuration file found, writing a template to %sapikeys.conf." % ownPath, "Configuration")
+    f = open(ownPath + "apikeys.conf", "w")
+    f.write(zlib.decompress(b64decode("eJxtj8FqwzAQRO/+ioXc/QG9hRxKKaWGhIQeZXlsL1Yko103+O+7bqtAIBfBvJllRjs6jPBTPa+0b95o\
+wko+xZ6HJTvlFKnngKraURPgBOS6jta05JIW0kQ6svwGa/pKC3kXKbXqOJILwVzY4T3fp0x9BuxJ183kTBkywyt/g25ohRVC7Wp4YFFkjkNtEy6sI51urIa\
+2ERSBbusvObJiN8+B/d92FzsaoFvJY7+OTuuquqD97E95ETX3HetLdWZTp6QuFPIBdUf7UdGvKQ0BRTVOxFY/XPwvPKQoyxX5GTvCZ+gd772HWO2E+IyV9A\
+8JWZfF"
+                                      )))
+    settings = {
+                'WebOfTrustAPIKey': None,
+                'VirusTotalAPIKey': None,
+                'GoogleAPIKey': None,
+                'PassiveTotalAPIKey': None,
+                'MetaScanAPIKey': None,
+                'TwitterConsumerKey': None,
+                'TwitterConsumerSecret': None,
+                'TwitterAccessToken': None,
+                'TwitterAccessTokenSecret': None,
+                }
+    arg.twitter = arg.passivetotal = arg.weboftrust = arg.virustotal = arg.metascan = arg.googlesafebrowsing = False
+    f.close()
+
 if arg.ip and arg.domain:
     printe("Specify an IP address or domain, not both! Exiting...", "Dual target")
     terminate()
@@ -342,22 +423,17 @@ if arg.ip:
         terminate()
     else:
         IPaddr = arg.ip
-        Domain = "Not defined"
+        Domain = ""
+
 elif arg.domain:
-    Domain = arg.domain.replace(
-        "https://",
-        "").replace(
-        "http://",
-        "").replace(
-            "/",
-        "")
+    Domain = arg.domain.replace("https://", "").replace("http://", "")
+    Domain = Domain.split("/")[0]
     try:
         my_resolver = dns.resolver.Resolver()
         my_resolver.nameservers = ['8.8.8.8']
         answers = my_resolver.query(Domain, 'A')
         printh(
-            "%s IP addresses returned, using first A record %s for %s." %
-            (len(answers), answers[0], Domain))
+            "%s IP addresses returned, using first A record %s for %s." % (len(answers), answers[0], Domain))
         IPaddr = str(answers[0])
     except dns.resolver.NXDOMAIN:
         printe("No A records returned from public DNS %s." %
@@ -370,13 +446,13 @@ elif arg.domain:
                 (IPaddr, IPaddrLocal))
     except socket.gaierror:
         printe(
-            "Resolving domain %s failed, assignign 127.0.0.1 as ip" %
+            "Resolving domain %s failed." %
             Domain, "Domain resolve / Local")
-        IPaddr = "127.0.0.1"
-
+        IPaddr = ""
 else:
     printe("No target given, exiting...", "Target")
     terminate()
+
 if not arg.nolog:
     if arg.logfile:
         logfile = arg.logfile
@@ -388,49 +464,197 @@ if not arg.nolog:
         sys.stdout = Logger(logfile)
 
 if arg.note:
-    printp("Note: %s" % arg.note)
-    print g.PIPE
+    printe("Note: %s" % arg.note)
+    pipe()
 
-iIPr = IPaddr.split(".")
-iIPr = iIPr[0] + "." + iIPr[1] + "." + iIPr[2] + ".0"
-
-if Domain == "Not defined":
-    printh(
-        "Using IP address %s, no domain specified. Unable to run some modules." %
-        IPaddr)
+if IPaddr != "":
+    iIPr = IPaddr.split(".")
+    iIPr = iIPr[0] + "." + iIPr[1] + "." + iIPr[2] + ".0"
 else:
-    printh("Using IP address %s for domain %s" % (IPaddr, Domain))
-if IPaddr != "127.0.0.1":
+    iIPr = ""
+
+if Domain == "":
+    printh("Using IP address %s, no domain specified. Unable to run some modules." %
+        IPaddr)
+
+if IPaddr != "":
     iptype = IP(IPaddr).iptype()
 else:
     iptype = "PUBLIC"
 if iptype == "PRIVATE" or iptype == "LOOPBACK":
-    printh("IP address type is %s this may lead to errors." % iptype.lower())
+    printh("IP address type is %s this may lead to errors." % iptype.lower(), "IP Type")
 else:
     "Fully Qualified Doman Name: " + socket.getfqdn(IPaddr) + c.END
 
-# GOOGLE SAFE BROWSING API LOOKUP
-if (arg.googlesafebrowsing or arg.lists or arg.all) and Domain != "Not defined":
+# VIEW LOCAL RESOLVE HISTORY
+if os.path.isfile(ownPath + "resolvehistory.log"):
+    f = open(ownPath + "resolvehistory.log", "r+")
+    h = f.read()
+    i = 0
+
+    if (Domain in h or IPaddr in h) and (Domain != ""):
+        printh("Latest three resolvations for address in local history:")
+        for line in reversed(h.splitlines()):
+            if (Domain in line or IPaddr in line) and i <= 2:
+                i += 1
+                printl(line, c.G)
+    f.close()
+
+# ADD resolve results
+if Domain != "":
+    f = open(ownPath + "resolvehistory.log", "a+")
+    if IPaddr == "":
+        history = ["Failed", curDate, Domain, IPaddr]
+    elif IPaddrLocal != IPaddr:
+        history = ["Resolved", curDate, Domain, IPaddr, "Local:", IPaddrLocal]
+    else:
+        history = ["Resolved", Domain, IPaddr, curDate]
+    f.write(", ".join(history))
+    f.write("\n")
+    f.close()
+
+# TWITTER
+if arg.twitter:
+    run.append("Twitter")
     try:
-        GoogleAPIKey = os.environ['GAPIKEY']
+        tso = TwitterSearchOrder() # create a TwitterSearchOrder object
+        keyword_domain = "\"" + Domain + "\""
+        keyword_ip = "\"" + IPaddr + "\""
+        if Domain == "" and IPaddr != "":
+            tso.set_keywords([ keyword_ip ], or_operator = True)
+            keywords_desc = "IP address"
+        elif Domain != "" and IPaddr == "":
+            tso.set_keywords([ keyword_domain ], or_operator = True)
+            keywords_desc = "domain name"
+        else:
+            tso.set_keywords([ keyword_domain, keyword_ip ], or_operator = True)
+            keywords_desc = "IP address or domain name"
+
+        printh("Querying Twitter for tweets mentioning %s..." % keywords_desc)
+        #tso.set_language('en')
+        tso.set_include_entities(False)
+        tso.remove_all_filters()
+        ts = TwitterSearch(
+            consumer_key = settings['TwitterConsumerKey'],
+            consumer_secret = settings['TwitterConsumerSecret'],
+            access_token = settings['TwitterAccessToken'],
+            access_token_secret = settings['TwitterAccessTokenSecret']
+         )
+        i = 0
+        for tweet in ts.search_tweets_iterable(tso):
+            if i < 100:
+                printl("[%s%s%s] %s@%s%s%s%s:" % (c.Y, tweet['created_at'], c.END, c.G, c.END,
+                                                          c.BOLD, tweet['user']['screen_name'], c.END
+                                              ))
+                printl("%s" % (tweet['text'].encode('utf-8').replace("\n", "%s/%s " % (c.R, c.END))))
+                try:
+                    printl("\t%s=> Expanded URL:%s %s" % (c.G, c.END, tweet['user']['entities']['url']['urls'][0]['expanded_url']
+                                                                              .replace(Domain, c.R + Domain + c.END).replace(IPaddr, c.R + Domain + c.END)))
+                except KeyError:
+                    ()
+                except IndexError:
+                    () # Do nothing.
+                i += 1
+            else:
+                printp(("Showing %s/100 results." % ts.get_amount_of_tweets()))
+                break
+        if i == 0:
+            printp("No tweets found.")
+    except TwitterSearchException as e:
+        printe(e)
+else:
+    notRun.append("Twitter")
+
+# PING
+if arg.ping and IPaddr != "":
+    run.append("Ping")
+    printh("Pinging %s, skip with CTRL-C..." % IPaddr)
+    try:
+        response = os.system("ping -c 1 " + IPaddr + " > /dev/null 2>&1")
+        if response == 0:
+            printl("%s is responding to ping." % (IPaddr), c.G)
+        else:
+            printl("%s is not responding to ping." % (IPaddr), c.Y)
+    except KeyboardInterrupt:
+        printl("Skipping ping.", c.R)
+        notRun.append("Ping")
+    pipe()
+else:
+    notRun.append("Ping")
+
+# METASCAN API LOOKUP
+if arg.metascan:
+    postdata_desc = postdata = ""
+    run.append("Metascan")
+    headers={'apikey': settings['MetaScanAPIKey']}
+    if Domain == "":
+        postdata =  str({'address': [IPaddr]}).replace(" ", "").replace("\'", "\"")
+        postdata_desc = "IP address"
+    if IPaddr == "":
+        postdata =  str({'address': [Domain]}).replace(" ", "").replace("\'", "\"")
+        postdata_desc = "Domain name"
+    if Domain != "" and IPaddr != "":
+        postdata =  str({'address': [IPaddr, Domain]}).replace(" ", "").replace("\'", "\"")
+        postdata_desc = "IP address and domain name"
+    printh("Querying Metascan Online with %s." % postdata_desc)
+    reply = requests.post(
+        "https://ipscan.metascan-online.com/v1/scan", data=postdata, headers=headers)
+
+    if reply.status_code != 200:
+        if reply.status_code == 400:
+            printe("Error %s: Bad request." % (reply.status_code), "MetaScan")
+        elif reply.status_code == 403:
+            printe("Error %s: Lookup rate limit reached, try again later." % (reply.status_code), "MetaScan")
+        elif reply.status_code == 401:
+            printe("Error %s: Invalid API key." % (reply.status_code), "MetaScan")
+        elif reply.status_code == 503:
+            printe("Error %s: Internal server error, service temporarily unavailable." % (reply.status_code), "MetaScan")
+        else:
+            printe("Error %s: Headers: %s Content: %s" % (reply.status_code, reply.headers, reply.content), "MetaScan")
+    else:
+        if str(reply.content) == "[]":
+            printp("Address not found in dataset.")
+        else:
+            replies = json.loads(reply.content)
+            for reply_dict in replies:
+                printp("%s%s%s: \t%s detections, scanned at %s" % (c.BOLD, reply_dict['address'], c.END, reply_dict['detected_by'], reply_dict['start_time']))
+                printl("Geolocation: %s: %s (lat. %s, lon. %s)" % (reply_dict['geo_info']['country_code'],
+                                                                        reply_dict['geo_info']['country_name'],
+                                                                        reply_dict['geo_info']['latitude'],
+                                                                        reply_dict['geo_info']['longitude']))
+                for i in reply_dict['scan_results']:
+                    source = i['source']
+                    for s in i['results']:
+                        if s['result'] != "unknown":
+                            printp("%s:" % source)
+                            printl("Detection time: %s\tUpdate time:%s\tConfidence: %s" % (s['detecttime'], s['updatetime'], s['confident']))
+                            printl("Result: %s%s%s \tAssessment: %s%s%s" % (c.Y, s['result'], c.END, c.Y, s['assessment'], c.END))
+                            printl("Alternative ID: %s" % s['alternativeid'])
+        run.append("MetaScan")
+else:
+    notRun.append("MetaScan")
+
+# GOOGLE SAFE BROWSING API LOOKUP
+if arg.googlesafebrowsing and Domain != "":
+    try:
         run.append("Google Safe Browsing")
         printh("Querying Google Safe Browsing API with domain name")
-        target = 'http://' + Domain + '/'
         parameters = {
             'client': 'check-lookup-tool',
-            'key': GoogleAPIKey,
+            'key': settings['GoogleAPIKey'],
             'appver': '1.0',
             'pver': '3.1',
-            'url': target}
+            'url': Domain
+        }
         reply = requests.get(
             "https://sb-ssl.google.com/safebrowsing/api/lookup",
             params=parameters,
             headers=headers)
         if reply.status_code == 200:
-            print g.PIPE + c.Y + "Status %s: Address http://%s/ found:" \
-            % (reply.status_code, Domain), reply.text + c.END
+            printl("Status %s: Address http://%s/ found: %s" % \
+            (reply.status_code, Domain, reply.text), c.Y)
         elif reply.status_code == 204:
-            print g.PIPE + c.G + "Status %s: The requested URL is legitimate." % (reply.status_code) + c.END
+            printl("Status %s: The requested URL is legitimate." % (reply.status_code), c.G)
         elif reply.status_code == 400:
             printe(
                 "Status %s: Bad Request." %
@@ -451,20 +675,19 @@ if (arg.googlesafebrowsing or arg.lists or arg.all) and Domain != "Not defined":
                 "Status %s: Unhandled reply: " %
                 (reply.status_code),
                 "Google Safe Browsing")
-        print g.PIPE
+        pipe()
     except KeyError:
         printe("Google API key not present.", "Google Safe Browsing")
 else:
     notRun.append("Google Safe Browsing")
 
 # WEB OF TRUST API LOOKUP
-if (arg.weboftrust or arg.lists or arg.all) and Domain != "Not defined":
+if arg.weboftrust and Domain != "":
     try:
-        WOTAPIKey = os.environ['WOTAPIKEY']  # same here.
         run.append("Web Of Trust")
         printh("Querying Web Of Trust reputation API with domain name")
         target = 'http://' + Domain + '/'
-        parameters = {'hosts': Domain + "/", 'key': WOTAPIKey}
+        parameters = {'hosts': Domain + "/", 'key': settings['WebOfTrustAPIKey']}
         reply = requests.get(
             "http://api.mywot.com/0.4/public_link_json2",
             params=parameters,
@@ -497,8 +720,8 @@ if (arg.weboftrust or arg.lists or arg.all) and Domain != "Not defined":
             for key, value in reply_dict[Domain].iteritems():
                 if key == "target":
                     printp(
-                        "Server response OK, Web Of Trust Reputation Score for %s%s:" %
-                        (c.BOLD, value))
+                        "Server response OK, Web Of Trust Reputation Score for %s%s%s:" %
+                        (c.BOLD, value, c.END))
                 elif key == "1":
                     ()  # Deprecated
                 elif key == "2":
@@ -516,25 +739,25 @@ if (arg.weboftrust or arg.lists or arg.all) and Domain != "Not defined":
                     if int(value[0]) >= 80:
                         assessment = c.G + "Excellent" + c.END
                     if key == "0":
-                        print g.PIPE
-                        print g.PIPE + "Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                        pipe()
+                        printl("Trustworthiness:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1]))
                     elif key == "4":
-                        print g.PIPE + "Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1])
+                        printl("Child safety:\t %s (%s) \t[%s%% confidence]" % (value[0], assessment, value[1]))
                 elif key == "categories":
-                    print g.PIPE
+                    pipe()
                     hasKeys = True
                     for e, s in value.iteritems():
-                        print g.PIPE + "Category:\t %s \t[%s%% confidence]" % (categories[e], s)
-                    print g.PIPE
+                        printl("Category:\t %s \t[%s%% confidence]" % (categories[e], s))
+                    pipe()
                 elif key == "blacklists":
                     hasKeys = True
                     for e, s in value.iteritems():
-                        print g.PIPE + "Blacklisted:\t %s \tID: %s" % (e, s)
+                        printl("Blacklisted:\t %s \tID: %s" % (e, s))
                 else:
-                    print "Unknown key", key, " => ", value
-        if not hasKeys:
-            print g.PIPE + c.G + "Web Of Trust has no records for", Domain + c.END
-            print g.PIPE
+                    printe("Unknown key %s => %s" % (key, value), "Web Of Trust")
+        if hasKeys == False:
+            printl("Web Of Trust has no records for %s" % (Domain), c.G)
+            pipe()
         if reply.status_code != 200:
             printe(
                 "Server returned status code %s see https://www.mywot.com/wiki/API for details." %
@@ -544,13 +767,116 @@ if (arg.weboftrust or arg.lists or arg.all) and Domain != "Not defined":
 else:
     notRun.append("Web Of Trust")
 
-# BLACKLISTS
+# VIRUSTOTAL
+if arg.virustotal:
+    try:
+        run.append("VirusTotal")
+        printh("Querying VirusTotal for %s..." % IPaddr)
 
-if arg.blacklists or arg.lists or arg.all:
+        parameters_ip = {
+            'ip': IPaddr,
+            'apikey': settings['VirusTotalAPIKey']
+        }
+
+        parameters_domain = {
+            'domain': Domain,
+            'apikey': settings['VirusTotalAPIKey']
+        }
+
+        vtresponse_ip = requests.get(
+            'https://www.virustotal.com/vtapi/v2/ip-address/report',
+            params=parameters_ip).content
+
+        vtresponse_domain = requests.get(
+            'https://www.virustotal.com/vtapi/v2/domain/report',
+            params=parameters_domain).content
+
+        vtresponse_dict = json.loads(vtresponse_domain)
+        if vtresponse_dict['response_code'] == 0:
+            printp("VirusTotal response: IP address not in dataset.")
+        else:
+            printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
+            for entry in vtresponse_dict['resolutions']:
+                printl("%s Last resolved: %s" % (entry['ip_address'], entry['last_resolved']))
+            pipe()
+            if len(vtresponse_dict['detected_urls']) >= 1:
+                printl("Detections in this IP address:", c.Y)
+                for entry in vtresponse_dict['detected_urls']:
+                    if len(entry['url']) <= 80:
+                        printl(entry['url'].replace("http", "hxxp"))
+                    else:
+                        printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
+
+                    if entry['positives'] >= 1:
+                        printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
+                    else:
+                        printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
+
+        vtresponse_dict = json.loads(vtresponse_ip)
+        if vtresponse_dict['response_code'] == 0:
+            printp("VirusTotal response: IP address not in dataset.")
+        else:
+            printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
+            for entry in vtresponse_dict['resolutions']:
+                printl("%s Last resolved: %s" % (entry['hostname'], entry['last_resolved']))
+            pipe()
+            if len(vtresponse_dict['detected_urls']) >= 1:
+                printl("Detections in this IP address:", c.Y)
+                for entry in vtresponse_dict['detected_urls']:
+                    if len(entry['url']) <= 80:
+                        printl(entry['url'].replace("http", "hxxp"))
+                    else:
+                        printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
+
+                    if entry['positives'] >= 1:
+                        printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
+                    else:
+                        printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
+    except KeyError:
+        ()
+else:
+    notRun.append("VirusTotal")
+
+# PASSIVETOTAL
+if arg.passivetotal and Domain != "":
+    try:
+        run.append("PassiveTotal")
+        # disable passivetotal's InsecureRequestWarning error message
+        requests.packages.urllib3.disable_warnings()
+        # define API key
+        pt = PassiveTotal(settings['PassiveTotalAPIKey'])
+        printh("Querying PassiveTotal for %s..." % IPaddr)
+        response = ""
+        try:
+            response = pt.get_passive(IPaddr)
+        except ValueError:
+            printe("Value error - no data received.", "PassiveTotal")
+        if response == "":
+            printe("Empty response, maybe your over your quota?", "PassiveTotal")
+        elif response['success']:
+            printl("Query: %s" % response['raw_query'])
+            printl("First Seen: %s\tLast Seen: %s" % (response['results']['first_seen'], response['results']['last_seen']))
+            printl("Resolve Count: %s" % response['result_count'])
+            printp("Resolutions")
+            response = response['results']
+            for resolve in response['records']:
+                printl("%s\t%s\t%s\t%s" % (resolve['resolve'], resolve['firstSeen'], resolve['lastSeen'], ', '.join([str(x) for x in resolve['source']])))
+        else:
+            printe("%s" % response['error'], "PassiveTotal")
+        pipe()
+
+    except KeyError:
+        printe("PassiveTotal API key not present.", "PassiveTotal")
+else:
+    notRun.append("PassiveTotal")
+
+# BLACKLISTS
+if arg.blacklists:
+    sourceCount = 0
     matchcollector = []
     run.append("Blacklists")
     removed = trimcache(72)  # Delete entries older than 72h
-    print g.STAR + c.B + "Cache trim: %s MB removed, current cache size %s MB." % removed + c.END
+    printh("Cache trim: %s MB removed, current cache size %s MB." % removed)
     totalLines = 0
     if os.path.isfile(blacklistSourceFile):
         with open(blacklistSourceFile) as sourcefile:
@@ -573,20 +899,22 @@ if arg.blacklists or arg.lists or arg.all:
     printh("Searching local blacklists...")
     localfiles = os.listdir(ownPath + "localdata")
     for file in localfiles:
+        if file[0] == ".":
+            continue
         domainmatch = ipmatch = rangematch = False
-        print g.PLUS + "Processing local blacklist file %s%s%s" % (c.BOLD, file, c.END)
+        printp("Processing local blacklist file %s%s%s" % (c.BOLD, file, c.END))
         file = ownPath + "localdata/" + file
         file = open(file, "r+")
         output = matchfinder(file.read().splitlines())
         for line in output:
-            print line
+            printl(line)
 
     printh("Downloading and searching from remote blacklists...")
     i = 0
     cacherefreshcount = 0
     for sourceline in blacklists:
         sourceline = sourceline.split("|")
-        sourceurl = sourceline[0].replace("\n", "").replace(" ", "")
+        sourceurl = sourceline[0].replace("\n", "").replace(" ^", "")
         if sourceurl[:1] == "#":
             continue  # Skip comment lines
         try:
@@ -606,7 +934,7 @@ if arg.blacklists or arg.lists or arg.all:
             data = ""
             head = requests.head(sourceurl, headers=headers)
         except Exception:
-            print g.PIPE + "[" + c.R + "Fail!" + c.END + "] Unable to connect to %s" % (sourcename)
+            printe("[%sFail!%s] Unable to connect to %s" % (c.R, c.END, sourcename))
             continue
         try:
             timestamp = head.headers['Last-Modified']
@@ -631,7 +959,7 @@ if arg.blacklists or arg.lists or arg.all:
                         c.R, (agediff / 86400), c.END, c.R, c.END)
                 else:
                     age = "%s%s%s days ago" % (c.Y, (agediff / 86400), c.END)
-            print g.PIPE + "[" + c.B + "Cache" + c.END + "] Using a cached copy. Source updated %s." % age
+            printl("[%sCache%s] Using a cached copy. Source updated %s." % (c.B, c.END, age))
             cachefiler = gzip.open(cachepath, "r+")
             cachefilew = open(os.devnull, "w+")
         else:
@@ -642,12 +970,12 @@ if arg.blacklists or arg.lists or arg.all:
             lines = cachefiler.readlines()
             for line in lines:
                 linecount += 1
-            print g.PIPE + "Searching from %s lines." % (linecount) + c.END
+            printl("Searching from %s lines." % (linecount))
             totalLines = totalLines + (linecount - 1)
             req = None
             output = matchfinder(lines)
             for line in output:
-                print line
+                printl(line)
         if not usecache:
             cacherefreshcount += 1
             req = requests.get(sourceurl, stream=True, headers=headers)
@@ -739,22 +1067,22 @@ if arg.blacklists or arg.lists or arg.all:
             totalLines = totalLines + linecount
             output = matchfinder(listfile.splitlines())
             for line in output:
-                print line
+                printl(line)
     cachefiler.close()
     cachefilew.close()
-    print g.PLUS + "A total of %s lines searched, %s cached files updated." % (totalLines, cacherefreshcount) + c.END
+    printp("A total of %s lines searched, %s cached files updated." % (totalLines, cacherefreshcount))
     if len(matchcollector) > 0:
         i = 0
-        print g.PLUS + g.C + "Found %s matches:" % len(matchcollector) + c.END
+        printp("Found %s matches:" % len(matchcollector))
         for line in matchcollector:
             i += 1
-            print g.PIPE + "%s: %s" % (i, line)
-    print g.PIPE
+            printl("%s: %s" % (i, line))
+    pipe()
 else:
     notRun.append("Blacklists")
 
 # SPAMLISTS
-if arg.spamlists or arg.lists or arg.all:
+if arg.spamlists and IPaddr != "":
     run.append("Spamlists")
     printh("Querying spamlists for %s..." % IPaddr)
     for bl in sourceListSpamDNS:
@@ -765,85 +1093,13 @@ if arg.spamlists or arg.lists or arg.all:
             answer_txt = my_resolver.query(query, "TXT")
             print g.PIPE + c.Y + 'IP: %s IS listed in %s (%s: %s)' % (IPaddr, bl, answers[0], answer_txt[0]) + c.END
         except dns.resolver.NXDOMAIN:
-            print g.PIPE + 'IP: %s is NOT listed in %s' % (IPaddr, bl)
-    print g.PIPE
+            printl('IP: %s is NOT listed in %s' % (IPaddr, bl))
+    pipe()
 else:
     notRun.append("Spamlists")
 
-# VIRUSTOTAL
-if arg.virustotal or arg.lists or arg.all:
-    try:
-        # Export your api keys to shell variables or put them here, add "Export
-        # VTAPIKEY=yourapikey to .bashrc or whatever your using."
-        VirusTotalAPIKey = os.environ['VTAPIKEY']
-        run.append("VirusTotal")
-        printh("Querying VirusTotal for %s..." % IPaddr)
-        parameters = {
-            'ip': IPaddr,
-            'apikey': VirusTotalAPIKey
-        }
-        vtresponse = requests.get(
-            'https://www.virustotal.com/vtapi/v2/ip-address/report',
-            params=parameters).content
-        vtresponse_dict = json.loads(vtresponse)
-        if vtresponse_dict['response_code'] == 0:
-            print g.STAR + c.Y + "VirusTotal response: IP address not in dataset." + c.END
-        else:
-            print g.PLUS + c.G + "VirusTotal response code", vtresponse_dict['response_code'], vtresponse_dict['verbose_msg'] + c.END
-            for entry in vtresponse_dict['resolutions']:
-                print g.PIPE + " =>", entry['hostname'], "Last resolved:", entry['last_resolved']
-            print g.PIPE
-            if len(vtresponse_dict['detected_urls']) >= 1:
-                print c.G + g.PLUS + "Detections in this address:" + c.END
-                for entry in vtresponse_dict['detected_urls']:
-                    print g.PIPE + entry['url'].replace("http", "hxxp") + c.END
-                    if entry['positives'] >= 1:
-                        print g.PIPE + "Positives: ", c.R + str(entry['positives']) + c.END, "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
-                    else:
-                        print g.PIPE + "Positives: ", entry['positives'], "\tTotal:", entry['total'], "\tScan date:", entry['scan_date']
-                    print g.PIPE
-    except KeyError:
-        printe("VirusTotal API key not present.", "VirusTotal")
-else:
-    notRun.append("VirusTotal")
-
-# PASSIVETOTAL
-if arg.passivetotal or arg.lists or arg.all:
-    try:
-        PassiveTotalAPIKey = os.environ['PTAPIKEY']  # same here.
-        run.append("PassiveTotal")
-        # disable passivetotal's InsecureRequestWarning error message
-        requests.packages.urllib3.disable_warnings()
-        # define API key
-        pt = PassiveTotal(PassiveTotalAPIKey)
-        printh("Querying PassiveTotal for %s..." % IPaddr)
-        try:
-            response = ""
-            response = pt.get_passive(IPaddr)
-        except ValueError:
-            printe("Value error - no data received.", "PassiveTotal")
-        if response == "":
-            g.FAIL + c.R + "Empty response, maybe your over your quota?"
-        elif response['success']:
-            print g.PIPE + "Query:", response['raw_query']
-            print g.PIPE + "First Seen:", response['results']['first_seen']
-            print g.PIPE + "Last Seen:", response['results']['last_seen']
-            print g.PIPE + "Resolve Count: ", response['result_count']
-            print g.PIPE + "Resolutions"
-            response = response['results']
-            for resolve in response['records']:
-                print g.PIPE + "==> ", resolve['resolve'], "\t", resolve['firstSeen'], "\t", resolve['lastSeen'], "\t", ', '.join([str(x) for x in resolve['source']])
-        else:
-            printe("%s" % response['error'], "PassiveTotal")
-        print g.PIPE
-
-    except KeyError:
-        printe("PassiveTotal API key not present.", "PassiveTotal")
-else:
-    notRun.append("PassiveTotal")
-
 # GEOIP
-if arg.geoip or arg.lists or arg.all:
+if arg.geoip:
     run.append("GeoIP")
     if os.path.isfile(GeoIPDatabaseFile):
         latitude = ""
@@ -860,9 +1116,9 @@ if arg.geoip or arg.lists or arg.all:
                         latitude = value
                     elif key == "longitude":
                         longitude = value
-                    print g.PIPE + str(key) + ": " + str(value)
+                    printl("%s: %s" % (str(key), str(value)))
                 if latitude != "" and longitude != "":
-                    print g.PIPE + "Google maps link for location: " + c.UL + "https://maps.google.com/maps?q=" + str(latitude) + "," + str(longitude) + c.END
+                    printl("Google maps link for location: https://maps.google.com/maps?q=%s,%s" % (latitude, longitude))
                 if arg.openlink:
                     webbrowser.open(
                         'https://maps.google.com/maps?q=' +
@@ -877,22 +1133,21 @@ if arg.geoip or arg.lists or arg.all:
                     sys.exc_info()[1])), "GeoIP")
     else:
         printe("Database not found at %s" % GeoIPDatabaseFile, "GeoIP")
-        printe(
-            "Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/",
-            "")
-    print g.PIPE
+        printe("Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/",
+               "")
+    pipe()
 else:
     notRun.append("GeoIP")
 
 # WHOIS
-if arg.whois or arg.lists or arg.all:
+if arg.whois:
     run.append("Whois")
     results = results2 = ""
     try:
         results = subprocess.check_output("whois " + IPaddr, shell=True)
     except subprocess.CalledProcessError:
         printe("Whois returned an error.", "Whois")
-    if Domain != "Not defined":
+    if Domain != "":
         try:
             results2 = subprocess.check_output("whois " + Domain, shell=True)
         except subprocess.CalledProcessError:
@@ -907,60 +1162,24 @@ if arg.whois or arg.lists or arg.all:
             else:
                 print g.PIPE + line + c.END
     if results2:
-        print c.HDR + g.PLUS + "Resolved address " + IPaddr + " for domain " + Domain + c.END
+        printh("Resolved address %s for domain %s" % (IPaddr, Domain))
         for line in results2.splitlines():
+            if len(line) >= 80:
+                line = line[0:80] + c.Y + "..." + c.END
             if "#" in line:
                 ()
             elif ("abuse" in line and "@" in line) or "address" in line or "person" in line or "phone" in line:
-                print g.PIPE + c.BOLD + c.B + line + c.END
+                printl(line, c.B)
             elif "descr" in line:
-                print g.PIPE + c.BOLD + c.Y + line + c.END
+                printl(line, c.Y)
             else:
-                print g.PIPE + line + c.END
-        print g.PIPE
+                printl(line)
+        pipe()
 else:
     notRun.append("Whois")
 
-# PING
-if arg.ping or arg.probes or arg.all:
-    run.append("Ping")
-    printh("Pinging %s, skip with CTRL-C..." % IPaddr)
-    try:
-        response = os.system("ping -c 1 " + IPaddr + " > /dev/null 2>&1")
-        if response == 0:
-            print g.PIPE + c.G + IPaddr, 'is responding to ping.' + c.END
-        else:
-            print g.PIPE + c.R + IPaddr, 'is not responding to ping.' + c.END
-            print g.PIPE + c.END
-    except KeyboardInterrupt:
-        print c.Y + g.MINUS + "Skipping ping." + c.END
-        notRun.append("Ping")
-    print g.PIPE
-else:
-    notRun.append("Ping")
-
-# OPENSSL
-if arg.cert or arg.probes or arg.all:
-    run.append("OpenSSL")
-    results = None
-    try:
-        results = subprocess.check_output(
-            "echo | openssl s_client -showcerts -servername %s -connect %s:443 2>/dev/null | openssl x509 -inform pem -noout -text" %
-            (Domain, Domain), shell=True)
-    except subprocess.CalledProcessError:
-        printe("OpenSSL returned an error.", "OpenSSL")
-    if results:
-        printh("Certificate information for https://%s/" % Domain)
-        for line in results.splitlines():
-            if "Issuer" in line or "Subject:" in line or "DNS:" in line or "Not Before" in line or "Not After" in line:
-                print g.PIPE + c.B + line.replace("  ", " ") + c.END
-            else:
-                print g.PIPE + line.replace("  ", " ") + c.END
-else:
-    notRun.append("OpenSSL")
-
 ### SCANPORTS & SCANHEADERS
-if arg.scanports or arg.scanheaders or arg.probes or arg.all:
+if arg.scanports or arg.scanheaders:
     run.append("Portscan")
     printh("Scanning common ports...")
     socket.setdefaulttimeout(3)
@@ -970,12 +1189,12 @@ if arg.scanports or arg.scanheaders or arg.probes or arg.all:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             result = sock.connect_ex((IPaddr, port))
             if result == 0:
-                print g.PIPE + c.G + "port " + str(port) + " is open." + c.END
+                printl("port %s is open." % port, c.G)
                 openports.append(port)
             else:
-                print g.PIPE + "Port %s is closed." % port
+                printl("port %s is closed." % port)
             sock.close()
-        if (arg.scanheaders or arg.probes or arg.all) and Domain != "Not defined":
+        if arg.scanheaders and Domain != "":
             for port in openports:
                 url = "http://" + Domain
                 try:
@@ -983,29 +1202,48 @@ if arg.scanports or arg.scanheaders or arg.probes or arg.all:
                         protocol = "https://"
                     else:
                         protocol = "http://"
-                    print g.PIPE
-                    print g.PLUS + "Getting headers for %s%s:%s" % (protocol, Domain, port) + c.END
+                    pipe()
+                    printp("Getting headers for %s%s:%s" % (protocol, Domain, port))
                     page = requests.head(
                         '%s%s:%s' %
                         (protocol, Domain, port), headers={
                             'user-agent': random.choice(uapool), 'referer': 'https://www.google.com'})
                     print g.PIPE + c.BOLD + "Server response code: %s" % page.status_code + c.END
                     for key, value in page.headers.items():
-                        print g.PIPE + c.BOLD + "%s: %s" % (key, value) + c.END
+                        printl("%s: %s" % (key, value))
                 except Exception as e:
                     printe(str(e), "Headerscan")
     except KeyboardInterrupt:
-        print c.R + g.STAR + "Caught Ctrl+C, interrupting..."
-        sys.terminate()
+        printe("Caught Ctrl+C, interrupting...")
     except socket.gaierror:
-        print c.R + g.STAR + "Hostname could not be resolved. Exiting..."
-        sys.terminate()
+        printe("Could not connect to address.")
     except socket.error:
-        print c.R + g.STAR + "Couldn't connect to server."
-        sys.terminate()
-    print g.PIPE + c.END
+        printe("Couldn't connect to server.")
+    pipe()
 else:
     notRun.append("Portscan")
+
+# OPENSSL
+if arg.cert and (IPaddr != "" or Domain !=""):
+    run.append("OpenSSL")
+    results = None
+    try:
+        results = subprocess.check_output(
+            "echo | openssl s_client -showcerts -servername %s -connect %s:443 2>/dev/null | openssl x509 -inform pem -noout -text 2>/dev/null" %
+            (Domain, Domain), shell=True)
+        if results:
+            printh("Certificate information for https://%s/" % Domain)
+            for line in results.splitlines():
+                if "Issuer" in line or "Subject:" in line or "DNS:" in line or "Not Before" in line or "Not After" in line:
+                    printl(line.replace("  ", " "), c.B)
+                else:
+                    printl(line.replace("  ", " "))
+    except subprocess.CalledProcessError:
+        printe("OpenSSL returned an error.", "OpenSSL")
+
+else:
+    notRun.append("OpenSSL")
+
 if logfile is not None:
     printh("Writing log file to %s" % logfile)
 terminate()

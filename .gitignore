@@ -1,2 +1,3 @@
 .DS_Store
-check.config
+apikeys.conf
+resolvehistory.log
