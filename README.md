@@ -8,7 +8,9 @@ It currently does the following things (all or selectable):
 - Query Web Of Trust API for webiste reputation and categories.<br>
 - Query and cache several domain- and IP blacklist sources for matches.<br>
 - Query PassiveDNS from PassiveTotal and VirusTotal.<br>
-- Query VirusTotal for matches coming from target address.<br>
+- Query VirusTotal for matches for target address.<br>
+- Query MetaScan for matches for target address<br>
+- Search Twitter for mentions of domain name or IP address<br>
 - Retrieve certificate information with OpenSSL<br>
 - Query WHOIS for domain name and IP address.<br>
 - Query local GeoIP database.<br>
