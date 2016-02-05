@@ -284,6 +284,7 @@ def trimcache(h):
     filelist = [f for f in os.listdir(ownPath + "cache")]
     removedSize = 0
     cacheSize = 0
+    removeCount = 0
     for f in filelist:
         filesize = os.path.getsize(ownPath + "cache/" + f)
         cacheSize = cacheSize + filesize
@@ -295,10 +296,11 @@ def trimcache(h):
             difference = (eNow - filedate) / 8600
             if difference >= h:
                 removedSize = removedSize + filesize
+                removeCount += 1
                 os.remove(ownPath + "cache/" + f)
     megabytesRemoved = removedSize / 1000000
     megabytesLeft = (cacheSize - removedSize) / 1000000
-    return megabytesRemoved, megabytesLeft
+    return removeCount, megabytesRemoved, megabytesLeft
 
 def printe(message, module):
     if module != "":
@@ -772,66 +774,62 @@ if arg.virustotal:
     try:
         run.append("VirusTotal")
         printh("Querying VirusTotal for %s..." % IPaddr)
+        if IPaddr != "":
+            parameters_ip = {
+                'ip': IPaddr,
+                'apikey': settings['VirusTotalAPIKey']
+            }
+            vtresponse_ip = requests.get(
+                'https://www.virustotal.com/vtapi/v2/ip-address/report',
+                params=parameters_ip).content
+            vtresponse_dict = json.loads(vtresponse_ip)
+            if vtresponse_dict['response_code'] == 0:
+                printp("VirusTotal response: IP address not in dataset.")
+            else:
+                printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
+                for entry in vtresponse_dict['resolutions']:
+                    printl("%s Last resolved: %s" % (entry['hostname'], entry['last_resolved']))
+                pipe()
+                if len(vtresponse_dict['detected_urls']) >= 1:
+                    printl("Detections in this IP address:", c.Y)
+                    for entry in vtresponse_dict['detected_urls']:
+                        if len(entry['url']) <= 80:
+                            printl(entry['url'].replace("http", "hxxp"))
+                        else:
+                            printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
+                        if entry['positives'] >= 1:
+                            printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
+                        else:
+                            printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
 
-        parameters_ip = {
-            'ip': IPaddr,
-            'apikey': settings['VirusTotalAPIKey']
-        }
+        if Domain != "":
+            parameters_domain = {
+                'domain': Domain,
+                'apikey': settings['VirusTotalAPIKey']
+            }
+            vtresponse_domain = requests.get(
+                'https://www.virustotal.com/vtapi/v2/domain/report',
+                params=parameters_domain).domain
+            vtresponse_dict = json.loads(vtresponse_domain)
+            if vtresponse_dict['response_code'] == 0:
+                printp("VirusTotal response: IP address not in dataset.")
+            else:
+                printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
+                for entry in vtresponse_dict['resolutions']:
+                    printl("%s Last resolved: %s" % (entry['ip_address'], entry['last_resolved']))
+                pipe()
+                if len(vtresponse_dict['detected_urls']) >= 1:
+                    printl("Detections in this IP address:", c.Y)
+                    for entry in vtresponse_dict['detected_urls']:
+                        if len(entry['url']) <= 80:
+                            printl(entry['url'].replace("http", "hxxp"))
+                        else:
+                            printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
+                        if entry['positives'] >= 1:
+                            printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
+                        else:
+                            printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
 
-        parameters_domain = {
-            'domain': Domain,
-            'apikey': settings['VirusTotalAPIKey']
-        }
-
-        vtresponse_ip = requests.get(
-            'https://www.virustotal.com/vtapi/v2/ip-address/report',
-            params=parameters_ip).content
-
-        vtresponse_domain = requests.get(
-            'https://www.virustotal.com/vtapi/v2/domain/report',
-            params=parameters_domain).content
-
-        vtresponse_dict = json.loads(vtresponse_domain)
-        if vtresponse_dict['response_code'] == 0:
-            printp("VirusTotal response: IP address not in dataset.")
-        else:
-            printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
-            for entry in vtresponse_dict['resolutions']:
-                printl("%s Last resolved: %s" % (entry['ip_address'], entry['last_resolved']))
-            pipe()
-            if len(vtresponse_dict['detected_urls']) >= 1:
-                printl("Detections in this IP address:", c.Y)
-                for entry in vtresponse_dict['detected_urls']:
-                    if len(entry['url']) <= 80:
-                        printl(entry['url'].replace("http", "hxxp"))
-                    else:
-                        printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
-
-                    if entry['positives'] >= 1:
-                        printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
-                    else:
-                        printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
-
-        vtresponse_dict = json.loads(vtresponse_ip)
-        if vtresponse_dict['response_code'] == 0:
-            printp("VirusTotal response: IP address not in dataset.")
-        else:
-            printp("VirusTotal response code %s: %s" % (vtresponse_dict['response_code'], vtresponse_dict['verbose_msg']))
-            for entry in vtresponse_dict['resolutions']:
-                printl("%s Last resolved: %s" % (entry['hostname'], entry['last_resolved']))
-            pipe()
-            if len(vtresponse_dict['detected_urls']) >= 1:
-                printl("Detections in this IP address:", c.Y)
-                for entry in vtresponse_dict['detected_urls']:
-                    if len(entry['url']) <= 80:
-                        printl(entry['url'].replace("http", "hxxp"))
-                    else:
-                        printl(entry['url'][0:90] + c.Y +  "...".replace("http", "hxxp"))
-
-                    if entry['positives'] >= 1:
-                        printl("Positives: %s%s%s\tTotal:%s\tScan date:%s" % (c.R, entry['positives'], c.END, entry['total'], entry['scan_date']))
-                    else:
-                        printl("Positives: %s\tTotal:%s\tScan date:%s" % (entry['positives'], entry['total'], entry['scan_date']))
     except KeyError:
         ()
 else:
@@ -875,8 +873,8 @@ if arg.blacklists:
     sourceCount = 0
     matchcollector = []
     run.append("Blacklists")
-    removed = trimcache(72)  # Delete entries older than 72h
-    printh("Cache trim: %s MB removed, current cache size %s MB." % removed)
+    removed = trimcache(48)  # Delete entries older than (h)
+    printh("Cache trim: %s files (%s MB) removed, current cache size %s MB." % removed)
     totalLines = 0
     if os.path.isfile(blacklistSourceFile):
         with open(blacklistSourceFile) as sourcefile:
