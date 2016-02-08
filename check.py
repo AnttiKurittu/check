@@ -809,7 +809,7 @@ if arg.virustotal:
             }
             vtresponse_domain = requests.get(
                 'https://www.virustotal.com/vtapi/v2/domain/report',
-                params=parameters_domain).domain
+                params=parameters_domain).content
             vtresponse_dict = json.loads(vtresponse_domain)
             if vtresponse_dict['response_code'] == 0:
                 printp("VirusTotal response: IP address not in dataset.")
