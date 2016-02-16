@@ -466,7 +466,7 @@ if not arg.nolog:
         sys.stdout = Logger(logfile)
 
 if arg.note:
-    printe("Note: %s" % arg.note)
+    printl("Note: %s" % arg.note)
     pipe()
 
 if IPaddr != "":
@@ -836,7 +836,7 @@ else:
     notRun.append("VirusTotal")
 
 # PASSIVETOTAL
-if arg.passivetotal and Domain != "":
+if arg.passivetotal and IPaddr != "":
     try:
         run.append("PassiveTotal")
         # disable passivetotal's InsecureRequestWarning error message
@@ -1154,11 +1154,11 @@ if arg.whois:
         printh("Querying IP Address %s" % IPaddr)
         for line in results.splitlines():
             if ("abuse" in line and "@" in line) or "address" in line or "person" in line or "phone" in line:
-                print g.PIPE + c.BOLD + c.B + line + c.END
+                printl(line, c.B)
             elif "descr" in line:
-                print g.PIPE + c.BOLD + c.Y + line + c.END
+                printl(line, c.Y)
             else:
-                print g.PIPE + line + c.END
+                printl(line)
     if results2:
         printh("Resolved address %s for domain %s" % (IPaddr, Domain))
         for line in results2.splitlines():
