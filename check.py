@@ -137,6 +137,10 @@ parser.add_argument("-NG", "--nogfx",
 parser.add_argument("-S", "--nosplash",
                     help="Suppress cool ASCII header graphic",
                     action="store_true")
+parser.add_argument("-P", "--pause",
+                    help="Pause between modules",
+                    action="store_true")
+
 
 arg = parser.parse_args()
 
@@ -356,9 +360,9 @@ def matchfinder(f):
         out.append("Address " + c.G + "not found" + c.END + " in list." + c.END)
     return out
 
-if not arg.nosplash:
-    print splash
-    print "\nCheck.py - Extended lookup tool. See -h for command line options.\n"
+def pause():
+    a = raw_input(" *  Press [ENTER] to continue...")
+    a = ""
 
 # Read or create configuration file
 if os.path.isfile(ownPath + "apikeys.conf"):
@@ -451,6 +455,7 @@ elif arg.domain:
             "Resolving domain %s failed." %
             Domain, "Domain resolve / Local")
         IPaddr = ""
+
 else:
     printe("No target given, exiting...", "Target")
     terminate()
@@ -464,6 +469,11 @@ if not arg.nolog:
         else:
             logfile = ownPath + "log/check-" + IPaddr + "-" + curDate + ".log"
         sys.stdout = Logger(logfile)
+
+if not arg.nosplash:
+    print splash
+    print "\nCheck.py - Extended lookup tool. See -h for command line options.\n"
+
 
 if arg.note:
     printl("Note: %s" % arg.note)
@@ -500,6 +510,8 @@ if os.path.isfile(ownPath + "resolvehistory.log"):
             if (Domain in line or IPaddr in line) and i <= 2:
                 i += 1
                 printl(line, c.G)
+        if arg.pause:
+            pause()
     f.close()
 
 # ADD resolve results
@@ -564,8 +576,12 @@ if arg.twitter:
             printp("No tweets found.")
     except TwitterSearchException as e:
         printe(e)
+    if arg.pause:
+        pause()
 else:
     notRun.append("Twitter")
+
+
 
 # PING
 if arg.ping and IPaddr != "":
@@ -581,8 +597,12 @@ if arg.ping and IPaddr != "":
         printl("Skipping ping.", c.R)
         notRun.append("Ping")
     pipe()
+    if arg.pause:
+        pause()
 else:
     notRun.append("Ping")
+
+
 
 # METASCAN API LOOKUP
 if arg.metascan:
@@ -633,6 +653,8 @@ if arg.metascan:
                             printl("Result: %s%s%s \tAssessment: %s%s%s" % (c.Y, s['result'], c.END, c.Y, s['assessment'], c.END))
                             printl("Alternative ID: %s" % s['alternativeid'])
         run.append("MetaScan")
+    if arg.pause:
+        pause()
 else:
     notRun.append("MetaScan")
 
@@ -680,6 +702,8 @@ if arg.googlesafebrowsing and Domain != "":
         pipe()
     except KeyError:
         printe("Google API key not present.", "Google Safe Browsing")
+    if arg.pause:
+        pause()
 else:
     notRun.append("Google Safe Browsing")
 
@@ -766,6 +790,8 @@ if arg.weboftrust and Domain != "":
                 reply.status_code, "Web Of Trust")
     except KeyError:
         printe("Web Of Trust API key not present.", "Web Of Trust")
+    if arg.pause:
+        pause()
 else:
     notRun.append("Web Of Trust")
 
@@ -832,6 +858,8 @@ if arg.virustotal:
 
     except KeyError:
         ()
+    if arg.pause:
+        pause()
 else:
     notRun.append("VirusTotal")
 
@@ -865,6 +893,8 @@ if arg.passivetotal and IPaddr != "":
 
     except KeyError:
         printe("PassiveTotal API key not present.", "PassiveTotal")
+    if arg.pause:
+        pause()
 else:
     notRun.append("PassiveTotal")
 
@@ -932,7 +962,7 @@ if arg.blacklists:
             data = ""
             head = requests.head(sourceurl, headers=headers)
         except Exception:
-            printe("[%sFail!%s] Unable to connect to %s" % (c.R, c.END, sourcename))
+            printe("[%sFail!%s] Unable to connect to %s" % (c.R, c.END, sourcename), "blacklists")
             continue
         try:
             timestamp = head.headers['Last-Modified']
@@ -1090,9 +1120,13 @@ if arg.spamlists and IPaddr != "":
             answers = my_resolver.query(query, "A")
             answer_txt = my_resolver.query(query, "TXT")
             print g.PIPE + c.Y + 'IP: %s IS listed in %s (%s: %s)' % (IPaddr, bl, answers[0], answer_txt[0]) + c.END
+        except dns.resolver.NoAnswer:
+            ()
         except dns.resolver.NXDOMAIN:
             printl('IP: %s is NOT listed in %s' % (IPaddr, bl))
     pipe()
+    if arg.pause:
+        pause()
 else:
     notRun.append("Spamlists")
 
@@ -1134,6 +1168,8 @@ if arg.geoip:
         printe("Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/",
                "")
     pipe()
+    if arg.pause:
+        pause()
 else:
     notRun.append("GeoIP")
 
@@ -1159,6 +1195,8 @@ if arg.whois:
                 printl(line, c.Y)
             else:
                 printl(line)
+        if arg.pause:
+            pause()
     if results2:
         printh("Resolved address %s for domain %s" % (IPaddr, Domain))
         for line in results2.splitlines():
@@ -1172,6 +1210,8 @@ if arg.whois:
                 printl(line, c.Y)
             else:
                 printl(line)
+        if arg.pause:
+            pause()
         pipe()
 else:
     notRun.append("Whois")
@@ -1218,6 +1258,8 @@ if arg.scanports or arg.scanheaders:
     except socket.error:
         printe("Couldn't connect to server.")
     pipe()
+    if arg.pause:
+        pause()
 else:
     notRun.append("Portscan")
 
@@ -1238,7 +1280,8 @@ if arg.cert and (IPaddr != "" or Domain !=""):
                     printl(line.replace("  ", " "))
     except subprocess.CalledProcessError:
         printe("OpenSSL returned an error.", "OpenSSL")
-
+    if arg.pause:
+        pause()
 else:
     notRun.append("OpenSSL")
 
