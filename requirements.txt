@@ -1,5 +1,10 @@
 IPy==0.83
 TwitterSearch==1.0.1
+argparse==1.2.1
 dnspython==1.15.0
+oauthlib==2.0.0
+python-dateutil==2.5.3
 requests==2.2.1
 requests-oauthlib==0.7.0
+six==1.10.0
+wsgiref==0.1.2

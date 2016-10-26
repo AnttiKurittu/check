@@ -1,5 +1,5 @@
 # coding=UTF-8
-
+# pip install the following packages: IPy, TwitterSearch, python-dateutil, dnspython
 # See https://github.com/AnttiKurittu/check/ for details.
 
 import datetime
@@ -421,6 +421,7 @@ elif arg.domain:
         my_resolver = dns.resolver.Resolver()
         my_resolver.nameservers = ['8.8.8.8']
         answers = my_resolver.query(Domain, 'A')
+
         printh(
             "%s IP addresses returned, using first A record %s for %s." % (len(answers), answers[0], Domain))
         IPaddr = str(answers[0])
