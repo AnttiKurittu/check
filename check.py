@@ -16,7 +16,6 @@ import subprocess
 import zipfile
 import dns.resolver
 import requests
-import GeoIP
 import StringIO
 import operator
 import random
@@ -26,7 +25,6 @@ import time
 import zlib
 import gzip
 from TwitterSearch import *
-from passivetotal import PassiveTotal
 from base64 import b64decode
 from IPy import IP
 
@@ -69,10 +67,6 @@ parser.add_argument("-sp",
                     "--scanports",
                     help="Scan common ports",
                     action="store_true")
-parser.add_argument("-gi",
-                    "--geoip",
-                    help="Query local GeoIP database",
-                    action="store_true")
 parser.add_argument("-sh",
                     "--scanheaders",
                     help="Scan common ports and try to retrieve headers",
@@ -96,10 +90,6 @@ parser.add_argument("-sl",
 parser.add_argument("-bl",
                     "--blacklists",
                     help="Check local and third-party blacklists for matches",
-                    action="store_true")
-parser.add_argument("-pt",
-                    "--passivetotal",
-                    help="Query passive DNS records from PassiveTotal for IP",
                     action="store_true")
 parser.add_argument("-vt",
                     "--virustotal",
@@ -148,7 +138,6 @@ if arg.lists is True or arg.all is True:
     arg.googlesafebrowsing = True
     arg.weboftrust = True
     arg.virustotal = True
-    arg.passivetotal = True
     arg.blacklists = True
     arg.spamlists = True
     arg.twitter = True
@@ -162,7 +151,6 @@ if arg.probes is True or arg.all is True:
 
 if arg.all is True:
     arg.whois = True
-    arg.geoip = True
 
 splash = zlib.decompress(b64decode("eJxtkNENgDAIRP87xf364y3gIiYkLMLwQhEtxktJKUc\
 ebYeWsHu49EdRRerj7BFDNB2IARa7Viu7lyApbGRR9RgMvPjibPTUcuCm6B7zbHUhEgWRWQt+nE/MqS\
@@ -176,7 +164,6 @@ curDate = str(datetime.datetime.now().strftime("%Y-%m-%d-%H:%M"))
 eNow = int(time.mktime(dateutil.parser.parse(curDate).timetuple()))
 
 # Specify database file location
-GeoIPDatabaseFile = "/usr/local/share/GeoIP/GeoLiteCity.dat"
 targetPortscan = [80, 443, 8000, 20, 21, 22, 23, 25, 53]  # What ports to scan
 blacklistSourceFile = ownPath + "blacklists.txt"
 sourceListSpamDNS = [
@@ -387,9 +374,6 @@ if os.path.isfile(ownPath + "apikeys.conf"):
     if settings['GoogleAPIKey'] is "":
         missingkeys.append("Google")
         arg.googlesafebrowsing = False
-    if settings['PassiveTotalAPIKey'] is "":
-        missingkeys.append("PassiveTotal")
-        arg.passivetotal = False
     if settings['TwitterConsumerKey'] is ""\
             or settings['TwitterConsumerSecret'] is ""\
             or settings['TwitterAccessToken'] is ""\
@@ -409,7 +393,6 @@ wko+xZ6HJTvlFKnngKraURPgBOS6jta05JIW0kQ6svwGa/pKC3kXKbXqOJILwVzY4T3fp0x9BuxJ183k
                 'WebOfTrustAPIKey': None,
                 'VirusTotalAPIKey': None,
                 'GoogleAPIKey': None,
-                'PassiveTotalAPIKey': None,
                 'MetaScanAPIKey': None,
                 'TwitterConsumerKey': None,
                 'TwitterConsumerSecret': None,
@@ -581,8 +564,6 @@ if arg.twitter:
 else:
     notRun.append("Twitter")
 
-
-
 # PING
 if arg.ping and IPaddr != "":
     run.append("Ping")
@@ -601,8 +582,6 @@ if arg.ping and IPaddr != "":
         pause()
 else:
     notRun.append("Ping")
-
-
 
 # METASCAN API LOOKUP
 if arg.metascan:
@@ -863,41 +842,6 @@ if arg.virustotal:
 else:
     notRun.append("VirusTotal")
 
-# PASSIVETOTAL
-if arg.passivetotal and IPaddr != "":
-    try:
-        run.append("PassiveTotal")
-        # disable passivetotal's InsecureRequestWarning error message
-        requests.packages.urllib3.disable_warnings()
-        # define API key
-        pt = PassiveTotal(settings['PassiveTotalAPIKey'])
-        printh("Querying PassiveTotal for %s..." % IPaddr)
-        response = ""
-        try:
-            response = pt.get_passive(IPaddr)
-        except ValueError:
-            printe("Value error - no data received.", "PassiveTotal")
-        if response == "":
-            printe("Empty response, maybe your over your quota?", "PassiveTotal")
-        elif response['success']:
-            printl("Query: %s" % response['raw_query'])
-            printl("First Seen: %s\tLast Seen: %s" % (response['results']['first_seen'], response['results']['last_seen']))
-            printl("Resolve Count: %s" % response['result_count'])
-            printp("Resolutions")
-            response = response['results']
-            for resolve in response['records']:
-                printl("%s\t%s\t%s\t%s" % (resolve['resolve'], resolve['firstSeen'], resolve['lastSeen'], ', '.join([str(x) for x in resolve['source']])))
-        else:
-            printe("%s" % response['error'], "PassiveTotal")
-        pipe()
-
-    except KeyError:
-        printe("PassiveTotal API key not present.", "PassiveTotal")
-    if arg.pause:
-        pause()
-else:
-    notRun.append("PassiveTotal")
-
 # BLACKLISTS
 if arg.blacklists:
     sourceCount = 0
@@ -1129,49 +1073,6 @@ if arg.spamlists and IPaddr != "":
         pause()
 else:
     notRun.append("Spamlists")
-
-# GEOIP
-if arg.geoip:
-    run.append("GeoIP")
-    if os.path.isfile(GeoIPDatabaseFile):
-        latitude = ""
-        longitude = latitude
-        try:
-            gi = GeoIP.open(GeoIPDatabaseFile, GeoIP.GEOIP_STANDARD)
-            gir = gi.record_by_addr(IPaddr)
-            printh("Querying GeoIP database for %s" % IPaddr)
-            if gir is None:
-                printe("No geodata found for IP address.", "GeoIP")
-            else:
-                for key, value in gir.iteritems():
-                    if key == "latitude":
-                        latitude = value
-                    elif key == "longitude":
-                        longitude = value
-                    printl("%s: %s" % (str(key), str(value)))
-                if latitude != "" and longitude != "":
-                    printl("Google maps link for location: https://maps.google.com/maps?q=%s,%s" % (latitude, longitude))
-                if arg.openlink:
-                    webbrowser.open(
-                        'https://maps.google.com/maps?q=' +
-                        str(latitude) +
-                        ',' +
-                        str(longitude))
-        except Exception:
-            printe(
-                "Failed: %s %s " %
-                (str(
-                    sys.exc_info()[0]), str(
-                    sys.exc_info()[1])), "GeoIP")
-    else:
-        printe("Database not found at %s" % GeoIPDatabaseFile, "GeoIP")
-        printe("Please install GeoIP database. http://dev.maxmind.com/geoip/legacy/install/city/",
-               "")
-    pipe()
-    if arg.pause:
-        pause()
-else:
-    notRun.append("GeoIP")
 
 # WHOIS
 if arg.whois:
