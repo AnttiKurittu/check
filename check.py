@@ -1,6 +1,9 @@
 # coding=UTF-8
-# pip install the following packages: IPy, TwitterSearch, python-dateutil, dnspython
-# See https://github.com/AnttiKurittu/check/ for details.
+# pip install IPy TwitterSearch python-dateutil dnspython
+#
+# If you get InsecurePlatformWarnings from urllib3, fix this by installing the pip package requests[security]
+#
+# See https://github.com/AnttiKurittu/check/ for more details.
 
 import datetime
 
@@ -549,6 +552,8 @@ if arg.twitter:
                     printl("\t%s=> Expanded URL:%s %s" % (c.G, c.END, tweet['user']['entities']['url']['urls'][0]['expanded_url']
                                                                               .replace(Domain, c.R + Domain + c.END).replace(IPaddr, c.R + Domain + c.END)))
                 except KeyError:
+                    ()
+                except AttributeError:
                     ()
                 except IndexError:
                     () # Do nothing.
