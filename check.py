@@ -1,4 +1,4 @@
-# coding=UTF-8
+# -*- coding: utf-8 -*-
 # pip install IPy TwitterSearch python-dateutil dnspython
 #
 # If you get InsecurePlatformWarnings from urllib3, fix this by installing the pip package requests[security]
@@ -545,11 +545,11 @@ if arg.twitter:
         for tweet in ts.search_tweets_iterable(tso):
             if i < 100:
                 printl("[%s%s%s] %s@%s%s%s%s:" % (c.Y, tweet['created_at'], c.END, c.G, c.END,
-                                                          c.BOLD, tweet['user']['screen_name'], c.END
+                                                          c.BOLD, tweet['user']['screen_name'].encode('utf8'), c.END
                                               ))
-                printl("%s" % (tweet['text'].encode('utf-8').replace("\n", "%s/%s " % (c.R, c.END))))
+                printl("%s" % (tweet['text'].encode('utf8').replace("\n", "%s/%s " % (c.R, c.END))))
                 try:
-                    printl("\t%s=> Expanded URL:%s %s" % (c.G, c.END, tweet['user']['entities']['url']['urls'][0]['expanded_url']
+                    printl("\t%s=> Expanded URL:%s %s" % (c.G, c.END, tweet['user']['entities']['url']['urls'][0]['expanded_url'].encode('utf8')
                                                                               .replace(Domain, c.R + Domain + c.END).replace(IPaddr, c.R + Domain + c.END)))
                 except KeyError:
                     ()
