@@ -564,7 +564,7 @@ if arg.twitter:
         if i == 0:
             printp("No tweets found.")
     except TwitterSearchException as e:
-        printe(e)
+        print(e)
     if arg.pause:
         pause()
 else:
@@ -605,7 +605,7 @@ if arg.metascan:
         postdata_desc = "IP address and domain name"
     printh("Querying Metascan Online with %s." % postdata_desc)
     reply = requests.post(
-        "https://ipscan.metascan-online.com/v1/scan", data=postdata, headers=headers)
+        "https://ipscan.metadefender.com/v1/scan", data=postdata, headers=headers)
 
     if reply.status_code != 200:
         if reply.status_code == 400:
